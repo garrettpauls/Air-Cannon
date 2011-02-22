@@ -1,0 +1,12 @@
+﻿# Build directories and files
+obj/
+bin/
+*.exe
+*.dll
+*.manifest
+*.cache
+*.g.i.cs
+
+# Misc files
+*.suo
+*.user
