@@ -109,6 +109,12 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AirCannon.Framework\AirCannon.Framework.csproj">
+      <Project>{02CAC314-1944-47BA-9160-AD7DF07558F8}</Project>
+      <Name>AirCannon.Framework</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
