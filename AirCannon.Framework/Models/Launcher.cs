@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using AirCannon.Framework.WPF;
 
 namespace AirCannon.Framework.Models
@@ -9,6 +11,7 @@ namespace AirCannon.Framework.Models
     public class Launcher : NotifyPropertyChangedBase
     {
         private readonly EnvironmentVariableDictionary mEnvironmentVariables;
+        private string mArguments;
         private string mFile;
         private string mName;
         private LaunchGroup mParent;
@@ -25,6 +28,15 @@ namespace AirCannon.Framework.Models
             mFile = string.Empty;
             mName = string.Empty;
             mWorkingDirectory = string.Empty;
+        }
+
+        /// <summary>
+        ///   Gets or sets the arguments used when launching the app.
+        /// </summary>
+        public string Arguments
+        {
+            get { return mArguments; }
+            set { SetPropertyValue(ref mArguments, value, () => Arguments); }
         }
 
         /// <summary>
@@ -96,6 +108,22 @@ namespace AirCannon.Framework.Models
             }
 
             return aggregatedEnvVars;
+        }
+
+        /// <summary>
+        ///   Launches the application and returns the running process.
+        /// </summary>
+        public Process Launch()
+        {
+            var startInfo = new ProcessStartInfo(File, Arguments);
+            startInfo.WorkingDirectory = WorkingDirectory;
+
+            foreach (var envVar in AggregateEnvironmentVariables())
+            {
+                startInfo.EnvironmentVariables.Add(envVar.Key, envVar.Value);
+            }
+
+            return Process.Start(startInfo);
         }
     }
 }
