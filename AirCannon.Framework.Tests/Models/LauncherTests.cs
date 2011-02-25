@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Tests.Utilities;
 using MbUnit.Framework;
@@ -105,6 +106,9 @@ namespace AirCannon.Framework.Tests.Models
         [TearDown]
         public void TestTeardown()
         {
+            //Give some time for files to unlock
+            Thread.Yield();
+
             Directory.Delete(mTempDir, true);
 
             Assert.IsFalse(Directory.Exists(mTempDir),

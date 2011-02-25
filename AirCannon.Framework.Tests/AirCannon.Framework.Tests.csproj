@@ -51,8 +51,10 @@
     <Compile Include="Models\LauncherTests.cs" />
     <Compile Include="Utilities\Assert2.cs" />
     <Compile Include="Utilities\Assert2Tests.cs" />
+    <Compile Include="Utilities\PropertyTests.cs" />
     <Compile Include="WPF\NotifyPropertyChangedBaseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WPF\ViewModelBaseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AirCannon.Framework\AirCannon.Framework.csproj">

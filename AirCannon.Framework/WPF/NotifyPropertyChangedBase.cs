@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using AirCannon.Framework.Utilities;
 
 namespace AirCannon.Framework.WPF
 {
@@ -22,8 +23,7 @@ namespace AirCannon.Framework.WPF
         /// </example>
         protected void RaisePropertyChanged<TProp>(Expression<Func<TProp>> propertySelector)
         {
-            string propertyName = ((MemberExpression) propertySelector.Body).Member.Name;
-            _RaisePropertyChanged(propertyName);
+            RaisePropertyChanged(Property.Name(propertySelector));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace AirCannon.Framework.WPF
         /// <summary>
         ///   Raises the property changed event with the given property.
         /// </summary>
-        private void _RaisePropertyChanged(string property)
+        protected void RaisePropertyChanged(string property)
         {
             var temp = PropertyChanged;
             if (temp != null)
