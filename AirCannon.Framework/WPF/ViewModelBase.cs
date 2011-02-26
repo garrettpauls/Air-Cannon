@@ -13,10 +13,10 @@ namespace AirCannon.Framework.WPF
         /// <summary>
         ///   Gets or sets the model this view model is wrapping.
         /// </summary>
-        protected TModel Model
+        public TModel Model
         {
             get { return mModel; }
-            set
+            protected set
             {
                 if (!ReferenceEquals(mModel, value))
                 {

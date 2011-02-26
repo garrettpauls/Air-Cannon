@@ -55,6 +55,7 @@
     <Compile Include="Utilities\PropertyTests.cs" />
     <Compile Include="WPF\NotifyPropertyChangedBaseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WPF\ReadOnlyWrappingCollectionTests.cs" />
     <Compile Include="WPF\ViewModelBaseTests.cs" />
   </ItemGroup>
   <ItemGroup>
