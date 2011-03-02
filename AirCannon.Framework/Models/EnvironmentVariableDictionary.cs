@@ -30,6 +30,67 @@ namespace AirCannon.Framework.Models
             }
         }
 
+        public bool Equals(EnvironmentVariableDictionary other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            if (Count != other.Count)
+            {
+                return false;
+            }
+
+            foreach (var key in Keys)
+            {
+                if (!other.ContainsKey(key))
+                {
+                    return false;
+                }
+                if (!Equals(this[key], other[key]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (EnvironmentVariableDictionary))
+            {
+                return false;
+            }
+            return Equals((EnvironmentVariableDictionary) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            int result = 397;
+
+            foreach (var item in this)
+            {
+                result = (result*397) ^ (item.Key != null ? item.Key.GetHashCode() : 0);
+                result = (result*397) ^ (item.Value != null ? item.Value.GetHashCode() : 0);
+            }
+
+            return result;
+        }
+
         /// <summary>
         ///   Updates the dictionary with the given <see cref = "KeyValuePair{TKey,TValue}" />s, 
         ///   overwriting any existing values and adding any new values.

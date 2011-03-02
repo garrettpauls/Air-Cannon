@@ -63,6 +63,70 @@ namespace AirCannon.Framework.Tests.Models
         }
 
         /// <summary>
+        ///   Verifies that two launchers are equal.
+        /// </summary>
+        [Test]
+        public void AreEqualTest()
+        {
+            var launcher = new Launcher();
+            var other = new Launcher();
+
+            Assert.AreEqual(launcher, other, "Blank launchers should be equal");
+
+            launcher.Arguments = "a";
+            other.Arguments = "a";
+            Assert.AreEqual(launcher, other, "Launchers with the same arguments should be equal");
+
+            launcher.File = "file";
+            other.File = "file";
+            Assert.AreEqual(launcher, other, "Launchers with the same file should be equal");
+
+            launcher.Name = "test";
+            other.Name = "test";
+            Assert.AreEqual(launcher, other, "Launchers with the same name should be equal");
+
+            launcher.WorkingDirectory = "wd";
+            other.WorkingDirectory = "wd";
+            Assert.AreEqual(launcher, other, "Launchers with the same working directory should be equal");
+
+            launcher.EnvironmentVariables["a"] = "a";
+            other.EnvironmentVariables["a"] = "a";
+            launcher.EnvironmentVariables["b"] = "b";
+            other.EnvironmentVariables["b"] = "b";
+            Assert.AreEqual(launcher, other, "Launchers with the same environment variables should be equal");
+        }
+
+        /// <summary>
+        ///   Verifies that two launchers are not equal.
+        /// </summary>
+        [Test]
+        public void AreNotEqualTest()
+        {
+            var launcher = new Launcher {Arguments = "a"};
+            var other = new Launcher {Arguments = "b"};
+            Assert.AreNotEqual(launcher, other, "Launchers with different arguments should not be equal");
+
+
+            launcher = new Launcher {File = "a"};
+            other = new Launcher {File = "b"};
+            Assert.AreNotEqual(launcher, other, "Launchers with different files should not be equal");
+
+            launcher = new Launcher {Name = "a"};
+            other = new Launcher {Name = "b"};
+            Assert.AreNotEqual(launcher, other, "Launchers with different names should not be equal");
+
+            launcher = new Launcher {WorkingDirectory = "a"};
+            other = new Launcher {WorkingDirectory = "b"};
+            Assert.AreNotEqual(launcher, other, "Launchers with different working directories should not be equal");
+
+            launcher = new Launcher();
+            other = new Launcher();
+            launcher.EnvironmentVariables["a"] = "a";
+            other.EnvironmentVariables["b"] = "b";
+            Assert.AreNotEqual(launcher, other, "Launchers with different environment variables should not be equal");
+        }
+
+        /// <summary>
         ///   Verifies the Launcher runs a simple script correctly.
         /// </summary>
         [Test, Timeout(60)]

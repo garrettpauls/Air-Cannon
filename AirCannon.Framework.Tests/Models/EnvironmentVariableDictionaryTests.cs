@@ -12,6 +12,36 @@ namespace AirCannon.Framework.Tests.Models
     public class EnvironmentVariableDictionaryTests
     {
         /// <summary>
+        ///   Verifies that <see cref = "EnvironmentVariableDictionary" /> compare equality correctly.
+        /// </summary>
+        [Test]
+        public void EqualityTest()
+        {
+            const string KEY1 = "KEY1";
+            const string KEY2 = "KEY2";
+            const string KEY3 = "KEY3";
+
+            var dictionary = new EnvironmentVariableDictionary();
+            var other = new EnvironmentVariableDictionary();
+
+            Assert.AreEqual(dictionary, other, "Empty dictionaries should be equal");
+
+            dictionary[KEY1] = KEY1;
+            dictionary[KEY2] = KEY2;
+            other[KEY1] = KEY1;
+            other[KEY2] = KEY2;
+
+            Assert.AreEqual(dictionary, other, "Dictionaries with the same key-value pairs should be equal");
+
+            other[KEY1] = KEY2;
+            Assert.AreNotEqual(dictionary, other, "Dictionaries with different key-value pairs should not be equal");
+
+            other[KEY1] = KEY1;
+            dictionary[KEY3] = KEY3;
+            Assert.AreNotEqual(dictionary, other, "Dictionaries with different keys should not be equal");
+        }
+
+        /// <summary>
         ///   Verifies that <see cref = "EnvironmentVariableDictionary.UpdateWith" /> works correctly.
         /// </summary>
         [Test]

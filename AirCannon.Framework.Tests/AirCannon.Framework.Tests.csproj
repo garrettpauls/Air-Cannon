@@ -50,6 +50,7 @@
     </Compile>
     <Compile Include="Models\EnvironmentVariableDictionaryTests.cs" />
     <Compile Include="Models\LauncherTests.cs" />
+    <Compile Include="Models\LaunchGroupTests.cs" />
     <Compile Include="Utilities\Assert2.cs" />
     <Compile Include="Utilities\Assert2Tests.cs" />
     <Compile Include="Utilities\PropertyTests.cs" />

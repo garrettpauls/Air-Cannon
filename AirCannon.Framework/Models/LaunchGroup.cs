@@ -1,17 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using AirCannon.Framework.WPF;
+using Newtonsoft.Json;
 
 namespace AirCannon.Framework.Models
 {
     /// <summary>
     ///   Represents a group of <see cref = "Launcher" />s that share common settings.
     /// </summary>
+    [DebuggerDisplay("{Name}")]
     public class LaunchGroup : NotifyPropertyChangedBase
     {
-        private readonly EnvironmentVariableDictionary mEnvironmentVariables;
-        private readonly ObservableCollection<LaunchGroup> mGroups;
-        private readonly ObservableCollection<Launcher> mLaunchers;
+        private EnvironmentVariableDictionary mEnvironmentVariables;
+        private ObservableCollection<LaunchGroup> mGroups;
+        private ObservableCollection<Launcher> mLaunchers;
         private string mName;
         private LaunchGroup mParent;
 
@@ -25,17 +31,16 @@ namespace AirCannon.Framework.Models
                            IEnumerable<LaunchGroup> groups = null,
                            IEnumerable<Launcher> launchers = null)
         {
-            mGroups = new ObservableCollection<LaunchGroup>();
-            mLaunchers = new ObservableCollection<Launcher>();
-            mEnvironmentVariables = new EnvironmentVariableDictionary();
-            mParent = parent;
+            Groups = new ObservableCollection<LaunchGroup>();
+            Launchers = new ObservableCollection<Launcher>();
+            EnvironmentVariables = new EnvironmentVariableDictionary();
+            Parent = parent;
 
             if (groups != null)
             {
                 foreach (var group in groups)
                 {
-                    mGroups.Add(group);
-                    group.Parent = this;
+                    Groups.Add(group);
                 }
             }
 
@@ -43,8 +48,7 @@ namespace AirCannon.Framework.Models
             {
                 foreach (var launcher in launchers)
                 {
-                    mLaunchers.Add(launcher);
-                    launcher.Parent = this;
+                    Launchers.Add(launcher);
                 }
             }
         }
@@ -56,6 +60,7 @@ namespace AirCannon.Framework.Models
         public EnvironmentVariableDictionary EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
+            set { SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
         }
 
         /// <summary>
@@ -64,6 +69,26 @@ namespace AirCannon.Framework.Models
         public ObservableCollection<LaunchGroup> Groups
         {
             get { return mGroups; }
+            set
+            {
+                if (mGroups != null)
+                {
+                    mGroups.CollectionChanged -= _HandleGroupCollectionChanged;
+                }
+
+                if (SetPropertyValue(ref mGroups, value, () => Groups))
+                {
+                    foreach (var launchGroup in mGroups)
+                    {
+                        launchGroup.Parent = this;
+                    }
+                }
+
+                if (mGroups != null)
+                {
+                    mGroups.CollectionChanged += _HandleGroupCollectionChanged;
+                }
+            }
         }
 
         /// <summary>
@@ -72,6 +97,26 @@ namespace AirCannon.Framework.Models
         public ObservableCollection<Launcher> Launchers
         {
             get { return mLaunchers; }
+            set
+            {
+                if (mLaunchers != null)
+                {
+                    mLaunchers.CollectionChanged -= _HandleLauncherCollectionChanged;
+                }
+
+                if (SetPropertyValue(ref mLaunchers, value, () => Launchers))
+                {
+                    foreach (var launcher in mLaunchers)
+                    {
+                        launcher.Parent = this;
+                    }
+                }
+
+                if (mLaunchers != null)
+                {
+                    mLaunchers.CollectionChanged += _HandleLauncherCollectionChanged;
+                }
+            }
         }
 
         /// <summary>
@@ -86,10 +131,128 @@ namespace AirCannon.Framework.Models
         /// <summary>
         ///   Gets the <see cref = "LaunchGroup" /> that contains this one, or <c>null</c> if none exists.
         /// </summary>
+        [JsonIgnore]
         public LaunchGroup Parent
         {
             get { return mParent; }
             private set { SetPropertyValue(ref mParent, value, () => Parent); }
+        }
+
+        /// <summary>
+        ///   Determines whether the specified <see cref = "LaunchGroup" /> is equal to the current <see cref = "LaunchGroup" />.
+        /// </summary>
+        /// <returns>
+        ///   true if the specified <see cref = "LaunchGroup" /> is equal to the current <see cref = "LaunchGroup" />; otherwise, false.
+        /// </returns>
+        /// <param name = "other">The <see cref = "LaunchGroup" /> to compare with the current <see cref = "LaunchGroup" />. </param>
+        /// <filterpriority>2</filterpriority>
+        public bool Equals(LaunchGroup other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return Equals(other.mEnvironmentVariables, mEnvironmentVariables) &&
+                   other.mGroups != null && mGroups != null &&
+                   other.mGroups.SequenceEqual(mGroups) &&
+                   other.mLaunchers != null && mLaunchers != null &&
+                   other.mLaunchers.SequenceEqual(mLaunchers) &&
+                   Equals(other.mName, mName);
+        }
+
+        /// <summary>
+        ///   Determines whether the specified <see cref = "T:System.Object" /> is equal to the current <see cref = "T:System.Object" />.
+        /// </summary>
+        /// <returns>
+        ///   true if the specified <see cref = "T:System.Object" /> is equal to the current <see cref = "T:System.Object" />; otherwise, false.
+        /// </returns>
+        /// <param name = "obj">The <see cref = "T:System.Object" /> to compare with the current <see cref = "T:System.Object" />. </param>
+        /// <filterpriority>2</filterpriority>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (LaunchGroup))
+            {
+                return false;
+            }
+            return Equals((LaunchGroup) obj);
+        }
+
+        /// <summary>
+        ///   Serves as a hash function for a particular type.
+        /// </summary>
+        /// <returns>
+        ///   A hash code for the current <see cref = "T:System.Object" />.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (mEnvironmentVariables != null ? mEnvironmentVariables.GetHashCode() : 0);
+                result = (result*397) ^ (mGroups != null ? mGroups.GetHashCode() : 0);
+                result = (result*397) ^ (mLaunchers != null ? mLaunchers.GetHashCode() : 0);
+                result = (result*397) ^ (mName != null ? mName.GetHashCode() : 0);
+                return result;
+            }
+        }
+
+        /// <summary>
+        ///   Creates a new <see cref = "LaunchGroup" /> from the JSON in the given file.
+        /// </summary>
+        /// <param name = "file">The path of the file to load from.</param>
+        /// <returns>The <see cref = "LaunchGroup" /> represented by the JSON in the file.</returns>
+        public static LaunchGroup LoadFrom(string file)
+        {
+            return JsonConvert.DeserializeObject<LaunchGroup>(File.ReadAllText(file));
+        }
+
+        /// <summary>
+        ///   Saves the <see cref = "LaunchGroup" /> to a file as JSON.
+        /// </summary>
+        /// <param name = "file">The file to save to.</param>
+        public void SaveTo(string file)
+        {
+            File.WriteAllText(file, JsonConvert.SerializeObject(this, Formatting.Indented));
+        }
+
+        /// <summary>
+        ///   Handles the CollectionChanged event of the Groups collection.
+        ///   Whenever a group is added, updates its parent to this launch group.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleGroupCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            foreach (LaunchGroup group in e.NewItems)
+            {
+                group.Parent = this;
+            }
+        }
+
+        /// <summary>
+        ///   Handles the CollectionChanged event of the launchers collection.
+        ///   When a launcher is added, updates its parent to this launch group.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleLauncherCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            foreach (Launcher launcher in e.NewItems)
+            {
+                launcher.Parent = this;
+            }
         }
     }
 }

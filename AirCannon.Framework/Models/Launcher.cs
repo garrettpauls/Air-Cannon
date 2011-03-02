@@ -1,19 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using AirCannon.Framework.WPF;
+using Newtonsoft.Json;
 
 namespace AirCannon.Framework.Models
 {
     /// <summary>
     ///   Settings for launching a given application.
     /// </summary>
+    [DebuggerDisplay("{Name}")]
     public class Launcher : NotifyPropertyChangedBase
     {
-        private readonly EnvironmentVariableDictionary mEnvironmentVariables;
         private string mArguments;
+        private EnvironmentVariableDictionary mEnvironmentVariables;
         private string mFile;
         private string mName;
         private LaunchGroup mParent;
+
         private string mWorkingDirectory;
 
         /// <summary>
@@ -24,6 +27,7 @@ namespace AirCannon.Framework.Models
         {
             mParent = parent;
             mEnvironmentVariables = new EnvironmentVariableDictionary();
+            mArguments = string.Empty;
             mFile = string.Empty;
             mName = string.Empty;
             mWorkingDirectory = string.Empty;
@@ -44,6 +48,7 @@ namespace AirCannon.Framework.Models
         public EnvironmentVariableDictionary EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
+            set { SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
         }
 
         /// <summary>
@@ -67,6 +72,7 @@ namespace AirCannon.Framework.Models
         /// <summary>
         ///   Gets or sets the parent.
         /// </summary>
+        [JsonIgnore]
         public LaunchGroup Parent
         {
             get { return mParent; }
@@ -107,6 +113,76 @@ namespace AirCannon.Framework.Models
             }
 
             return aggregatedEnvVars;
+        }
+
+        /// <summary>
+        ///   Determines whether the specified <see cref = "Launcher" /> is equal to the current <see cref = "Launcher" />.
+        /// </summary>
+        /// <returns>
+        ///   true if the specified <see cref = "Launcher" /> is equal to the current <see cref = "Launcher" />; otherwise, false.
+        /// </returns>
+        /// <param name = "other">The <see cref = "Launcher" /> to compare with the current <see cref = "Launcher" />. </param>
+        /// <filterpriority>2</filterpriority>
+        public bool Equals(Launcher other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return Equals(other.mEnvironmentVariables, mEnvironmentVariables) &&
+                   Equals(other.mArguments, mArguments) &&
+                   Equals(other.mFile, mFile) &&
+                   Equals(other.mName, mName) &&
+                   Equals(other.mWorkingDirectory, mWorkingDirectory);
+        }
+
+        /// <summary>
+        ///   Determines whether the specified <see cref = "T:System.Object" /> is equal to the current <see cref = "T:System.Object" />.
+        /// </summary>
+        /// <returns>
+        ///   true if the specified <see cref = "T:System.Object" /> is equal to the current <see cref = "T:System.Object" />; otherwise, false.
+        /// </returns>
+        /// <param name = "obj">The <see cref = "T:System.Object" /> to compare with the current <see cref = "T:System.Object" />. </param>
+        /// <filterpriority>2</filterpriority>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (Launcher))
+            {
+                return false;
+            }
+            return Equals((Launcher) obj);
+        }
+
+        /// <summary>
+        ///   Serves as a hash function for a particular type.
+        /// </summary>
+        /// <returns>
+        ///   A hash code for the current <see cref = "T:System.Object" />.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (mEnvironmentVariables != null ? mEnvironmentVariables.GetHashCode() : 0);
+                result = (result*397) ^ (mArguments != null ? mArguments.GetHashCode() : 0);
+                result = (result*397) ^ (mFile != null ? mFile.GetHashCode() : 0);
+                result = (result*397) ^ (mName != null ? mName.GetHashCode() : 0);
+                result = (result*397) ^ (mWorkingDirectory != null ? mWorkingDirectory.GetHashCode() : 0);
+                return result;
+            }
         }
 
         /// <summary>

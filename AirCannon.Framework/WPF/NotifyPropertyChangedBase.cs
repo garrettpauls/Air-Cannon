@@ -27,6 +27,18 @@ namespace AirCannon.Framework.WPF
         }
 
         /// <summary>
+        ///   Raises the property changed event with the given property.
+        /// </summary>
+        protected void RaisePropertyChanged(string property)
+        {
+            var temp = PropertyChanged;
+            if (temp != null)
+            {
+                temp(this, new PropertyChangedEventArgs(property));
+            }
+        }
+
+        /// <summary>
         ///   Sets the backing property to the new value if necessary and raises the property changed event.
         /// </summary>
         /// <typeparam name = "TProp">The type of the property.</typeparam>
@@ -53,18 +65,6 @@ namespace AirCannon.Framework.WPF
             }
 
             return false;
-        }
-
-        /// <summary>
-        ///   Raises the property changed event with the given property.
-        /// </summary>
-        protected void RaisePropertyChanged(string property)
-        {
-            var temp = PropertyChanged;
-            if (temp != null)
-            {
-                temp(this, new PropertyChangedEventArgs(property));
-            }
         }
 
         #region Implementation of INotifyPropertyChanged
