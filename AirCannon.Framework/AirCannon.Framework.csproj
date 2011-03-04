@@ -52,6 +52,7 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -70,6 +71,7 @@
     <Compile Include="Models\LaunchGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\Property.cs" />
+    <Compile Include="WPF\DelegateCommand.cs" />
     <Compile Include="WPF\NotifyPropertyChangedBase.cs" />
     <Compile Include="WPF\ReadOnlyWrappingCollection.cs" />
     <Compile Include="WPF\ViewModelBase.cs" />
