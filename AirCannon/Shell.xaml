@@ -1,8 +1,12 @@
 ﻿<Window x:Class="AirCannon.Shell"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Air Cannon"
-        Height="300"
-        Width="300">
-	<Grid></Grid>
+        xmlns:Views="clr-namespace:AirCannon.Views" 
+        xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
+        Title="Air Cannon" SizeToContent="WidthAndHeight">
+    <Views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Views:MainView.DataContext>
+            <ViewModels:MainViewModel />
+        </Views:MainView.DataContext>
+    </Views:MainView>
 </Window>
