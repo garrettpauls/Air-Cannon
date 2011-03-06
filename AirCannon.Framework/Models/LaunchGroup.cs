@@ -66,7 +66,27 @@ namespace AirCannon.Framework.Models
         public EnvironmentVariableDictionary EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
-            set { HasChanges |= SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
+
+            set
+            {
+                if (mEnvironmentVariables != value)
+                {
+                    if (mEnvironmentVariables != null)
+                    {
+                        mEnvironmentVariables.CollectionChanged -= _HandleEnvironmentVariablesChanged;
+                    }
+
+                    mEnvironmentVariables = value;
+
+                    if (mEnvironmentVariables != null)
+                    {
+                        mEnvironmentVariables.CollectionChanged += _HandleEnvironmentVariablesChanged;
+                    }
+
+                    RaisePropertyChanged(() => EnvironmentVariables);
+                    HasChanges = true;
+                }
+            }
         }
 
         /// <summary>
@@ -296,6 +316,16 @@ namespace AirCannon.Framework.Models
             {
                 HasChanges = true;
             }
+        }
+
+        /// <summary>
+        ///   Marks the launch group as having changes when the environment variables are changed.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleEnvironmentVariablesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            HasChanges = true;
         }
 
         /// <summary>

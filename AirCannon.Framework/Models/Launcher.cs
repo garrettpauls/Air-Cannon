@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using AirCannon.Framework.WPF;
 using Newtonsoft.Json;
@@ -25,12 +27,13 @@ namespace AirCannon.Framework.Models
         /// <param name = "parent">The <see cref = "LaunchGroup" /> that contains this Launcher.</param>
         public Launcher(LaunchGroup parent = null)
         {
-            mParent = parent;
-            mEnvironmentVariables = new EnvironmentVariableDictionary();
-            mArguments = string.Empty;
-            mFile = string.Empty;
-            mName = string.Empty;
-            mWorkingDirectory = string.Empty;
+            Parent = parent;
+            EnvironmentVariables = new EnvironmentVariableDictionary();
+            Arguments = string.Empty;
+            File = string.Empty;
+            Name = string.Empty;
+            WorkingDirectory = string.Empty;
+            HasChanges = false;
         }
 
         /// <summary>
@@ -48,7 +51,26 @@ namespace AirCannon.Framework.Models
         public EnvironmentVariableDictionary EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
-            set { HasChanges |= SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
+            set
+            {
+                if (mEnvironmentVariables != value)
+                {
+                    if (mEnvironmentVariables != null)
+                    {
+                        mEnvironmentVariables.CollectionChanged -= _HandleEnvironmentVariablesChanged;
+                    }
+
+                    mEnvironmentVariables = value;
+
+                    if (mEnvironmentVariables != null)
+                    {
+                        mEnvironmentVariables.CollectionChanged += _HandleEnvironmentVariablesChanged;
+                    }
+
+                    RaisePropertyChanged(() => EnvironmentVariables);
+                    HasChanges = true;
+                }
+            }
         }
 
         /// <summary>
@@ -209,6 +231,16 @@ namespace AirCannon.Framework.Models
             }
 
             return Process.Start(startInfo);
+        }
+
+        /// <summary>
+        ///   Marks the launcher as having changes when the environment variable collection is changed.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleEnvironmentVariablesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            HasChanges = true;
         }
     }
 }
