@@ -5,7 +5,7 @@
         xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
         Title="Air Cannon" SizeToContent="WidthAndHeight">
 	<Window.DataContext>
-		<ViewModels:MainViewModel />
+		<ViewModels:MainViewModel x:Name="mMainViewModel"/>
 	</Window.DataContext>
 	<Window.InputBindings>
         <KeyBinding Command="{Binding NewCommand}" Key="N" Modifiers="Control" />

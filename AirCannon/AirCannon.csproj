@@ -87,8 +87,17 @@
     <Compile Include="ViewModels\LauncherViewModel.cs" />
     <Compile Include="ViewModels\LaunchGroupViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Views\EnvironmentVariableEditView.xaml.cs">
+      <DependentUpon>EnvironmentVariableEditView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LauncherEditView.xaml.cs">
+      <DependentUpon>LauncherEditView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LauncherTreeView.xaml.cs">
       <DependentUpon>LauncherTreeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LaunchGroupEditView.xaml.cs">
+      <DependentUpon>LaunchGroupEditView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
@@ -115,6 +124,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -130,7 +140,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\EnvironmentVariableEditView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LauncherEditView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LauncherTreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LaunchGroupEditView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

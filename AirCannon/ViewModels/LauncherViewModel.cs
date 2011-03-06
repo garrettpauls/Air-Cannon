@@ -1,4 +1,5 @@
-﻿using AirCannon.Framework.Models;
+﻿using System.Collections.Generic;
+using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 
@@ -9,6 +10,17 @@ namespace AirCannon.ViewModels
     /// </summary>
     public class LauncherViewModel : ViewModelBase<Launcher>
     {
+        private static readonly string[] mPassthroughPropertyNames =
+            new[]
+                {
+                    Property<LauncherViewModel>.Name(p => p.Arguments),
+                    Property<LauncherViewModel>.Name(p => p.EnvironmentVariables),
+                    Property<LauncherViewModel>.Name(p => p.File),
+                    Property<LauncherViewModel>.Name(p => p.HasChanges),
+                    Property<LauncherViewModel>.Name(p => p.Name),
+                    Property<LauncherViewModel>.Name(p => p.WorkingDirectory),
+                };
+
         private LaunchGroupViewModel mParent;
 
         /// <summary>
@@ -48,6 +60,14 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
+        ///   Gets a value indicating whether this instance has changes.
+        /// </summary>
+        public bool HasChanges
+        {
+            get { return Model.HasChanges; }
+        }
+
+        /// <summary>
         ///   Gets or sets the name to describe this launcher.
         /// </summary>
         public string Name
@@ -65,6 +85,23 @@ namespace AirCannon.ViewModels
             private set { SetPropertyValue(ref mParent, value, () => Parent); }
         }
 
+        /// <summary>
+        ///   Gets the passthrough property names.
+        /// </summary>
+        protected override IEnumerable<string> PassthroughPropertyNames
+        {
+            get { return mPassthroughPropertyNames; }
+        }
+
+        /// <summary>
+        ///   Gets or sets the working directory.
+        /// </summary>
+        public string WorkingDirectory
+        {
+            get { return Model.WorkingDirectory; }
+            set { Model.WorkingDirectory = value; }
+        }
+
         #region Overrides of ViewModelBase<Launcher>
 
         /// <summary>
@@ -76,12 +113,10 @@ namespace AirCannon.ViewModels
         {
             if (propertyName == Property<Launcher>.Name(p => p.Parent))
             {
-                mParent = new LaunchGroupViewModel(Model.Parent);
+                Parent = new LaunchGroupViewModel(Model.Parent);
             }
-            else
-            {
-                RaisePropertyChanged(propertyName);
-            }
+
+            base.OnBasePropertyChanged(propertyName);
         }
 
         #endregion

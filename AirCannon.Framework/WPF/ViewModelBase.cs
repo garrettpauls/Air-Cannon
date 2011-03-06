@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace AirCannon.Framework.WPF
 {
@@ -36,10 +38,25 @@ namespace AirCannon.Framework.WPF
         }
 
         /// <summary>
+        ///   A list of property names that, when changes in the model, will be used to
+        ///   fire the <see cref = "INotifyPropertyChanged.PropertyChanged" /> event on this object.
+        /// </summary>
+        protected virtual IEnumerable<string> PassthroughPropertyNames
+        {
+            get { return new string[0]; }
+        }
+
+        /// <summary>
         ///   Called when a property on the Model is called.
         /// </summary>
         /// <param name = "propertyName">Name of the property that was changed.</param>
-        protected abstract void OnBasePropertyChanged(string propertyName);
+        protected virtual void OnBasePropertyChanged(string propertyName)
+        {
+            if (PassthroughPropertyNames.Contains(propertyName))
+            {
+                RaisePropertyChanged(propertyName);
+            }
+        }
 
         /// <summary>
         ///   Handles the PropertyChanged event of the Model. 

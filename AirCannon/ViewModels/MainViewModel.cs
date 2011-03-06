@@ -1,7 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using System.Windows;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Services;
 using AirCannon.Framework.WPF;
+using AirCannon.Properties;
 
 namespace AirCannon.ViewModels
 {
@@ -17,14 +20,13 @@ namespace AirCannon.ViewModels
         private LaunchGroupViewModel mRoot;
         private DelegateCommand mSaveAsCommand;
         private DelegateCommand mSaveCommand;
-        private string mSaveFile;
 
         /// <summary>
         ///   Initializes a new instance of the <see cref = "MainViewModel" /> class.
         /// </summary>
         public MainViewModel()
         {
-            Root = new LaunchGroupViewModel(new LaunchGroup());
+            _Open(Settings.Default.CurrentFile);
         }
 
         /// <summary>
@@ -145,10 +147,27 @@ namespace AirCannon.ViewModels
             var file = Service<IUserInteraction>.Instance.OpenFilePrompt(JSON_FILE_FILTER);
             if (file != null && _PromptForContinueIfRootIsChanged())
             {
-                Root = new LaunchGroupViewModel(LaunchGroup.LoadFrom(file));
-                mSaveFile = file;
+                _Open(file);
             }
         }
+
+        /// <summary>
+        ///   Opens the given file as the root node.
+        /// </summary>
+        /// <param name = "file">The file to open.</param>
+        private void _Open(string file)
+        {
+            if (File.Exists(file))
+            {
+                Root = new LaunchGroupViewModel(LaunchGroup.LoadFrom(file));
+                Settings.Default.CurrentFile = file;
+            }
+            else
+            {
+                Root = new LaunchGroupViewModel(new LaunchGroup());
+            }
+        }
+
 
         /// <summary>
         ///   If the root model has changes this prompts the user if they want to save their 
@@ -191,12 +210,13 @@ You can save your changes, discard them, or cancel the current operation.",
         /// <returns><c>true</c> if the save was successful, otherwise <c>false</c>.</returns>
         private bool _Save()
         {
-            if (mSaveFile == null)
+            if (Settings.Default.CurrentFile == null)
             {
                 return _SaveAs();
             }
 
-            Root.Model.SaveTo(mSaveFile);
+            Root.Model.SaveTo(Settings.Default.CurrentFile);
+            Root.Model.ClearAllHasChanges();
 
             return true;
         }
@@ -214,7 +234,7 @@ You can save your changes, discard them, or cancel the current operation.",
                 return false;
             }
 
-            mSaveFile = file;
+            Settings.Default.CurrentFile = file;
             return _Save();
         }
     }

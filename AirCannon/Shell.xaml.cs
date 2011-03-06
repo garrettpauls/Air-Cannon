@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -21,6 +22,30 @@ namespace AirCannon
         public Shell()
         {
             InitializeComponent();
+
+            _DebugHook();
+        }
+
+        [Conditional("DEBUG")]
+        private void _DebugHook()
+        {
+            Mouse.AddMouseDownHandler(this, _DebugHandleMouseDown);
+        }
+
+        /// <summary>
+        /// When a debugger is attached and control is held, clicking executes a breakpoint.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Input.MouseButtonEventArgs"/> instance containing the event data.</param>
+        private void _DebugHandleMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Debugger.IsAttached && 
+                Keyboard.Modifiers == ModifierKeys.Control &&
+                e.LeftButton == MouseButtonState.Pressed)
+            {
+                var elementOver = Mouse.DirectlyOver;
+                Debugger.Break();
+            }
         }
     }
 }

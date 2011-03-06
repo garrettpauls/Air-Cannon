@@ -6,7 +6,7 @@
             <MenuItem Header="_New" Command="{Binding NewCommand}" InputGestureText="Ctrl+N"/>
             <MenuItem Header="_Save" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S"/>
             <MenuItem Header="Save _As..." Command="{Binding SaveAsCommand}" InputGestureText="Ctrl+Shift+S"/>
-            <MenuItem Header="Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+            <MenuItem Header="_Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
             <Separator />
             <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
         </MenuItem>

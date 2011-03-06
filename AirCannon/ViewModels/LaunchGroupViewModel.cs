@@ -11,6 +11,16 @@ namespace AirCannon.ViewModels
     /// </summary>
     public class LaunchGroupViewModel : ViewModelBase<LaunchGroup>
     {
+        private static readonly string[] mPassthroughPropertyNames =
+            new[]
+                {
+                    Property<LaunchGroupViewModel>.Name(p => p.EnvironmentVariables),
+                    Property<LaunchGroupViewModel>.Name(p => p.HasChanges),
+                    Property<LaunchGroupViewModel>.Name(p => p.Launchers),
+                    Property<LaunchGroupViewModel>.Name(p => p.LaunchGroups),
+                    Property<LaunchGroupViewModel>.Name(p => p.Name),
+                };
+
         private ReadOnlyWrappingCollection<LaunchGroupViewModel, LaunchGroup> mLaunchGroups;
         private ReadOnlyWrappingCollection<LauncherViewModel, Launcher> mLaunchers;
         private LaunchGroupViewModel mParent;
@@ -38,6 +48,17 @@ namespace AirCannon.ViewModels
         public EnvironmentVariableDictionary EnvironmentVariables
         {
             get { return Model.EnvironmentVariables; }
+        }
+
+        /// <summary>
+        ///   Gets a value indicating whether this instance has changes.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has changes; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasChanges
+        {
+            get { return Model.HasChanges; }
         }
 
         /// <summary>
@@ -91,6 +112,14 @@ namespace AirCannon.ViewModels
             private set { SetPropertyValue(ref mParent, value, () => Parent); }
         }
 
+        /// <summary>
+        ///   Gets the passthrough property names.
+        /// </summary>
+        protected override IEnumerable<string> PassthroughPropertyNames
+        {
+            get { return mPassthroughPropertyNames; }
+        }
+
         #region Overrides of ViewModelBase<LaunchGroup>
 
         /// <summary>
@@ -102,10 +131,13 @@ namespace AirCannon.ViewModels
             {
                 Parent = new LaunchGroupViewModel(Model.Parent);
             }
-            else
+            else if (propertyName == Property<LaunchGroup>.Name(p => p.Groups) ||
+                     propertyName == Property<LaunchGroup>.Name(p => p.Launchers))
             {
-                RaisePropertyChanged(propertyName);
+                RaisePropertyChanged(() => Children);
             }
+
+            base.OnBasePropertyChanged(propertyName);
         }
 
         #endregion
