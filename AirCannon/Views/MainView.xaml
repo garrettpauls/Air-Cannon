@@ -21,7 +21,7 @@
 			<ColumnDefinition Width="Auto" MinWidth="3" />
 			<ColumnDefinition Width="*" MinWidth="100" />
 		</Grid.ColumnDefinitions>
-        <Views:MenuView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding Path=Root}" />
+        <Views:MenuView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding}" />
         <Views:LauncherTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Path=Root}" />
         <GridSplitter Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=ColumnGridSplitter}"
                 HorizontalAlignment="Stretch" />

@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 using Newtonsoft.Json;
 
@@ -17,6 +20,7 @@ namespace AirCannon.Framework.Models
     {
         private EnvironmentVariableDictionary mEnvironmentVariables;
         private ObservableCollection<LaunchGroup> mGroups;
+        private bool mHasChanges;
         private ObservableCollection<Launcher> mLaunchers;
         private string mName;
         private LaunchGroup mParent;
@@ -35,6 +39,8 @@ namespace AirCannon.Framework.Models
             Launchers = new ObservableCollection<Launcher>();
             EnvironmentVariables = new EnvironmentVariableDictionary();
             Parent = parent;
+
+            HasChanges = false;
 
             if (groups != null)
             {
@@ -60,7 +66,7 @@ namespace AirCannon.Framework.Models
         public EnvironmentVariableDictionary EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
-            set { SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
+            set { HasChanges |= SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
         }
 
         /// <summary>
@@ -82,6 +88,8 @@ namespace AirCannon.Framework.Models
                     {
                         launchGroup.Parent = this;
                     }
+
+                    HasChanges = true;
                 }
 
                 if (mGroups != null)
@@ -89,6 +97,16 @@ namespace AirCannon.Framework.Models
                     mGroups.CollectionChanged += _HandleGroupCollectionChanged;
                 }
             }
+        }
+
+        /// <summary>
+        ///   Gets or sets a value indicating whether this instance has changes.
+        /// </summary>
+        [JsonIgnore]
+        public bool HasChanges
+        {
+            get { return mHasChanges; }
+            set { SetPropertyValue(ref mHasChanges, value, () => HasChanges); }
         }
 
         /// <summary>
@@ -110,6 +128,7 @@ namespace AirCannon.Framework.Models
                     {
                         launcher.Parent = this;
                     }
+                    HasChanges = true;
                 }
 
                 if (mLaunchers != null)
@@ -125,7 +144,7 @@ namespace AirCannon.Framework.Models
         public string Name
         {
             get { return mName; }
-            set { SetPropertyValue(ref mName, value, () => Name); }
+            set { HasChanges |= SetPropertyValue(ref mName, value, () => Name); }
         }
 
         /// <summary>
@@ -135,7 +154,25 @@ namespace AirCannon.Framework.Models
         public LaunchGroup Parent
         {
             get { return mParent; }
-            private set { SetPropertyValue(ref mParent, value, () => Parent); }
+            private set { HasChanges |= SetPropertyValue(ref mParent, value, () => Parent); }
+        }
+
+        /// <summary>
+        ///   Sets <see cref = "HasChanges" /> to false on this group and all children groups and launchers.
+        /// </summary>
+        public void ClearAllHasChanges()
+        {
+            HasChanges = false;
+
+            foreach (var group in Groups)
+            {
+                group.ClearAllHasChanges();
+            }
+
+            foreach (var launcher in Launchers)
+            {
+                launcher.HasChanges = false;
+            }
         }
 
         /// <summary>
@@ -215,7 +252,11 @@ namespace AirCannon.Framework.Models
         /// <returns>The <see cref = "LaunchGroup" /> represented by the JSON in the file.</returns>
         public static LaunchGroup LoadFrom(string file)
         {
-            return JsonConvert.DeserializeObject<LaunchGroup>(File.ReadAllText(file));
+            var group = JsonConvert.DeserializeObject<LaunchGroup>(File.ReadAllText(file));
+
+            group.ClearAllHasChanges();
+
+            return group;
         }
 
         /// <summary>
@@ -225,6 +266,36 @@ namespace AirCannon.Framework.Models
         public void SaveTo(string file)
         {
             File.WriteAllText(file, JsonConvert.SerializeObject(this, Formatting.Indented));
+        }
+
+        /// <summary>
+        ///   Handles the PropertyChanged event of a child <see cref = "LaunchGroup" />.
+        ///   Used to update <see cref = "HasChanges" />.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.ComponentModel.PropertyChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleChildGroupPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Property<LaunchGroup>.Name(p => p.HasChanges) &&
+                ((LaunchGroup) sender).HasChanges)
+            {
+                HasChanges = true;
+            }
+        }
+
+        /// <summary>
+        ///   Handles the PropertyChanged event of a child <see cref = "Launcher" />.
+        ///   Used to update <see cref = "HasChanges" />.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.ComponentModel.PropertyChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleChildLauncherPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Property<Launcher>.Name(p => p.HasChanges) &&
+                ((Launcher) sender).HasChanges)
+            {
+                HasChanges = true;
+            }
         }
 
         /// <summary>
@@ -238,7 +309,10 @@ namespace AirCannon.Framework.Models
             foreach (LaunchGroup group in e.NewItems)
             {
                 group.Parent = this;
+                group.PropertyChanged += _HandleChildGroupPropertyChanged;
             }
+
+            HasChanges = true;
         }
 
         /// <summary>
@@ -252,7 +326,10 @@ namespace AirCannon.Framework.Models
             foreach (Launcher launcher in e.NewItems)
             {
                 launcher.Parent = this;
+                launcher.PropertyChanged += _HandleChildLauncherPropertyChanged;
             }
+
+            HasChanges = true;
         }
     }
 }

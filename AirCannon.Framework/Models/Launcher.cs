@@ -14,9 +14,9 @@ namespace AirCannon.Framework.Models
         private string mArguments;
         private EnvironmentVariableDictionary mEnvironmentVariables;
         private string mFile;
+        private bool mHasChanges;
         private string mName;
         private LaunchGroup mParent;
-
         private string mWorkingDirectory;
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace AirCannon.Framework.Models
         public string Arguments
         {
             get { return mArguments; }
-            set { SetPropertyValue(ref mArguments, value, () => Arguments); }
+            set { HasChanges |= SetPropertyValue(ref mArguments, value, () => Arguments); }
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace AirCannon.Framework.Models
         public EnvironmentVariableDictionary EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
-            set { SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
+            set { HasChanges |= SetPropertyValue(ref mEnvironmentVariables, value, () => EnvironmentVariables); }
         }
 
         /// <summary>
@@ -57,7 +57,17 @@ namespace AirCannon.Framework.Models
         public string File
         {
             get { return mFile; }
-            set { SetPropertyValue(ref mFile, value, () => File); }
+            set { HasChanges |= SetPropertyValue(ref mFile, value, () => File); }
+        }
+
+        /// <summary>
+        ///   Gets or sets a value indicating whether this instance has changes.
+        /// </summary>
+        [JsonIgnore]
+        public bool HasChanges
+        {
+            get { return mHasChanges; }
+            set { SetPropertyValue(ref mHasChanges, value, () => HasChanges); }
         }
 
         /// <summary>
@@ -66,7 +76,7 @@ namespace AirCannon.Framework.Models
         public string Name
         {
             get { return mName; }
-            set { SetPropertyValue(ref mName, value, () => Name); }
+            set { HasChanges |= SetPropertyValue(ref mName, value, () => Name); }
         }
 
         /// <summary>
@@ -76,7 +86,7 @@ namespace AirCannon.Framework.Models
         public LaunchGroup Parent
         {
             get { return mParent; }
-            set { SetPropertyValue(ref mParent, value, () => Parent); }
+            set { HasChanges |= SetPropertyValue(ref mParent, value, () => Parent); }
         }
 
         /// <summary>
@@ -85,7 +95,7 @@ namespace AirCannon.Framework.Models
         public string WorkingDirectory
         {
             get { return mWorkingDirectory; }
-            set { SetPropertyValue(ref mWorkingDirectory, value, () => WorkingDirectory); }
+            set { HasChanges |= SetPropertyValue(ref mWorkingDirectory, value, () => WorkingDirectory); }
         }
 
         /// <summary>

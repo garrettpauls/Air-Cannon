@@ -127,6 +127,39 @@ namespace AirCannon.Framework.Tests.Models
         }
 
         /// <summary>
+        ///   Verifies the <see cref = "Launcher.HasChanges" /> property works correctly.
+        /// </summary>
+        [Test]
+        public void HasChangesTest()
+        {
+            Launcher launcher = new Launcher();
+            Assert.IsFalse(launcher.HasChanges);
+
+            launcher.File = "a";
+            Assert.IsTrue(launcher.HasChanges, "Updating File should cause HasChanges to be true");
+
+            launcher.HasChanges = false;
+            launcher.Name = "a";
+            Assert.IsTrue(launcher.HasChanges, "Updating Name should cause HasChanges to be true");
+
+            launcher.HasChanges = false;
+            launcher.Parent = new LaunchGroup();
+            Assert.IsTrue(launcher.HasChanges, "Updating Parent should cause HasChanges to be true");
+
+            launcher.HasChanges = false;
+            launcher.WorkingDirectory = "a";
+            Assert.IsTrue(launcher.HasChanges, "Updating WorkingDirectory should cause HasChanges to be true");
+
+            launcher.HasChanges = false;
+            launcher.EnvironmentVariables.Add("a", "a");
+            Assert.IsTrue(launcher.HasChanges, "New environment variables should cause HasChanges to be true");
+
+            launcher.HasChanges = false;
+            launcher.EnvironmentVariables["a"] = "b";
+            Assert.IsTrue(launcher.HasChanges, "Updating environment variables should cause HasChanges to be true");
+        }
+
+        /// <summary>
         ///   Verifies the Launcher runs a simple script correctly.
         /// </summary>
         [Test, Timeout(60)]
@@ -171,12 +204,12 @@ namespace AirCannon.Framework.Tests.Models
         public void TestTeardown()
         {
             //Give some time for files to unlock
-            Thread.Yield();
+            Thread.Sleep(500);
 
             Directory.Delete(mTempDir, true);
 
             Assert.IsFalse(Directory.Exists(mTempDir),
-                           "Temporary directory '{0}' could not be deleted", mTempDir);
+                           "Test cleanup - Temporary directory '{0}' could not be deleted", mTempDir);
 
             mTempDir = string.Empty;
         }
