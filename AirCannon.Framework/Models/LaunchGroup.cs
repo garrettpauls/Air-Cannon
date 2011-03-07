@@ -18,7 +18,7 @@ namespace AirCannon.Framework.Models
     [DebuggerDisplay("{Name}")]
     public class LaunchGroup : NotifyPropertyChangedBase
     {
-        private EnvironmentVariableDictionary mEnvironmentVariables;
+        private EnvironmentVariableCollection mEnvironmentVariables;
         private ObservableCollection<LaunchGroup> mGroups;
         private bool mHasChanges;
         private ObservableCollection<Launcher> mLaunchers;
@@ -37,7 +37,7 @@ namespace AirCannon.Framework.Models
         {
             Groups = new ObservableCollection<LaunchGroup>();
             Launchers = new ObservableCollection<Launcher>();
-            EnvironmentVariables = new EnvironmentVariableDictionary();
+            EnvironmentVariables = new EnvironmentVariableCollection();
             Parent = parent;
 
             HasChanges = false;
@@ -63,7 +63,7 @@ namespace AirCannon.Framework.Models
         ///   Gets the environment variables that will be used when 
         ///   launching any child <see cref = "Launcher" />s.
         /// </summary>
-        public EnvironmentVariableDictionary EnvironmentVariables
+        public EnvironmentVariableCollection EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
 
@@ -74,6 +74,7 @@ namespace AirCannon.Framework.Models
                     if (mEnvironmentVariables != null)
                     {
                         mEnvironmentVariables.CollectionChanged -= _HandleEnvironmentVariablesChanged;
+                        mEnvironmentVariables.ItemChanged -= _HandleEnvironmentVariableChanged;
                     }
 
                     mEnvironmentVariables = value;
@@ -81,6 +82,7 @@ namespace AirCannon.Framework.Models
                     if (mEnvironmentVariables != null)
                     {
                         mEnvironmentVariables.CollectionChanged += _HandleEnvironmentVariablesChanged;
+                        mEnvironmentVariables.ItemChanged += _HandleEnvironmentVariableChanged;
                     }
 
                     RaisePropertyChanged(() => EnvironmentVariables);
@@ -316,6 +318,16 @@ namespace AirCannon.Framework.Models
             {
                 HasChanges = true;
             }
+        }
+
+        /// <summary>
+        ///   Handles the ItemChanged event of the environment variable collection.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "AirCannon.Framework.Models.ItemChangedEventArgs&lt;AirCannon.Framework.Models.EnvironmentVariable&gt;" /> instance containing the event data.</param>
+        private void _HandleEnvironmentVariableChanged(object sender, ItemChangedEventArgs<EnvironmentVariable> e)
+        {
+            HasChanges = true;
         }
 
         /// <summary>

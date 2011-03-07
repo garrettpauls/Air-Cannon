@@ -45,7 +45,7 @@ namespace AirCannon.ViewModels
         /// <summary>
         ///   Gets the environment variable collection used when launching the app.
         /// </summary>
-        public EnvironmentVariableDictionary EnvironmentVariables
+        public EnvironmentVariableCollection EnvironmentVariables
         {
             get { return Model.EnvironmentVariables; }
         }

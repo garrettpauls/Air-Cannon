@@ -65,7 +65,7 @@ namespace AirCannon.Framework.Tests.Models
             Assert.IsTrue(group.HasChanges, "Changing Name should cause HasChanges to be true");
 
             group.ClearAllHasChanges();
-            group.EnvironmentVariables.Add("A", "A");
+            group.EnvironmentVariables.Add(new EnvironmentVariable("A", "A"));
             Assert.IsTrue(group.HasChanges, "New environment variables should cause HasChanges to be true");
 
             group.ClearAllHasChanges();

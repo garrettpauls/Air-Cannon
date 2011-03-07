@@ -34,6 +34,7 @@
 		<TextBox Text="{Binding Path=WorkingDirectory, UpdateSourceTrigger=PropertyChanged}"
 		         Grid.Row="3" Grid.Column="1" />
 
-		<Views:EnvironmentVariableEditView Grid.Row="4" Grid.ColumnSpan="2" />
+		<Views:EnvironmentVariableEditView Grid.Row="4" Grid.ColumnSpan="2"
+		                                   DataContext="{Binding Path=EnvironmentVariables}" />
 	</Grid>
 </UserControl>

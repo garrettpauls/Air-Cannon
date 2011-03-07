@@ -14,7 +14,7 @@ namespace AirCannon.Framework.Models
     public class Launcher : NotifyPropertyChangedBase
     {
         private string mArguments;
-        private EnvironmentVariableDictionary mEnvironmentVariables;
+        private EnvironmentVariableCollection mEnvironmentVariables;
         private string mFile;
         private bool mHasChanges;
         private string mName;
@@ -28,7 +28,7 @@ namespace AirCannon.Framework.Models
         public Launcher(LaunchGroup parent = null)
         {
             Parent = parent;
-            EnvironmentVariables = new EnvironmentVariableDictionary();
+            EnvironmentVariables = new EnvironmentVariableCollection();
             Arguments = string.Empty;
             File = string.Empty;
             Name = string.Empty;
@@ -48,7 +48,7 @@ namespace AirCannon.Framework.Models
         /// <summary>
         ///   Gets the environment variables that are used when launching.
         /// </summary>
-        public EnvironmentVariableDictionary EnvironmentVariables
+        public EnvironmentVariableCollection EnvironmentVariables
         {
             get { return mEnvironmentVariables; }
             set
@@ -58,6 +58,7 @@ namespace AirCannon.Framework.Models
                     if (mEnvironmentVariables != null)
                     {
                         mEnvironmentVariables.CollectionChanged -= _HandleEnvironmentVariablesChanged;
+                        mEnvironmentVariables.ItemChanged -= _HandleEnvironmentVariableChanged;
                     }
 
                     mEnvironmentVariables = value;
@@ -65,6 +66,7 @@ namespace AirCannon.Framework.Models
                     if (mEnvironmentVariables != null)
                     {
                         mEnvironmentVariables.CollectionChanged += _HandleEnvironmentVariablesChanged;
+                        mEnvironmentVariables.ItemChanged += _HandleEnvironmentVariableChanged;
                     }
 
                     RaisePropertyChanged(() => EnvironmentVariables);
@@ -124,9 +126,9 @@ namespace AirCannon.Framework.Models
         ///   Gets all the environment variables to be used when launching this application, starting
         ///   with the topmost parent and overriding values down to the launcher's settings.
         /// </summary>
-        public EnvironmentVariableDictionary AggregateEnvironmentVariables()
+        public EnvironmentVariableCollection AggregateEnvironmentVariables()
         {
-            var envVars = new Stack<EnvironmentVariableDictionary>();
+            var envVars = new Stack<EnvironmentVariableCollection>();
             envVars.Push(EnvironmentVariables);
 
             LaunchGroup parent = mParent;
@@ -137,7 +139,7 @@ namespace AirCannon.Framework.Models
                 parent = parent.Parent;
             }
 
-            var aggregatedEnvVars = new EnvironmentVariableDictionary(envVars.Pop());
+            var aggregatedEnvVars = new EnvironmentVariableCollection(envVars.Pop());
 
             while (envVars.Count > 0)
             {
@@ -231,6 +233,16 @@ namespace AirCannon.Framework.Models
             }
 
             return Process.Start(startInfo);
+        }
+
+        /// <summary>
+        ///   Handles the ItemChanged event of the environment variable collection.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "AirCannon.Framework.Models.ItemChangedEventArgs&lt;AirCannon.Framework.Models.EnvironmentVariable&gt;" /> instance containing the event data.</param>
+        private void _HandleEnvironmentVariableChanged(object sender, ItemChangedEventArgs<EnvironmentVariable> e)
+        {
+            HasChanges = true;
         }
 
         /// <summary>

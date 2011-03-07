@@ -41,25 +41,25 @@ namespace AirCannon.Framework.Tests.Models
                                     });
 
             group.EnvironmentVariables.UpdateWith(
-                new KeyValuePair<string, string>("A", "A"),
-                new KeyValuePair<string, string>("B", "B"),
-                new KeyValuePair<string, string>("D", "D"));
+                new EnvironmentVariable("A", "A"),
+                new EnvironmentVariable("B", "B"),
+                new EnvironmentVariable("D", "D"));
 
             group.Groups[0].EnvironmentVariables.UpdateWith(
-                new KeyValuePair<string, string>("C", "C"),
-                new KeyValuePair<string, string>("B", "B2"));
+                new EnvironmentVariable("C", "C"),
+                new EnvironmentVariable("B", "B2"));
 
             launcher.EnvironmentVariables.UpdateWith(
-                new KeyValuePair<string, string>("D", "D2"),
-                new KeyValuePair<string, string>("E", "E"));
+                new EnvironmentVariable("D", "D2"),
+                new EnvironmentVariable("E", "E"));
 
             var envVars = launcher.AggregateEnvironmentVariables();
 
-            Assert2.ContainsKeyAndValue(envVars, "A", "A");
-            Assert2.ContainsKeyAndValue(envVars, "B", "B2");
-            Assert2.ContainsKeyAndValue(envVars, "C", "C");
-            Assert2.ContainsKeyAndValue(envVars, "D", "D2");
-            Assert2.ContainsKeyAndValue(envVars, "E", "E");
+            Assert.Contains(envVars, new EnvironmentVariable("A", "A"));
+            Assert.Contains(envVars, new EnvironmentVariable("B", "B2"));
+            Assert.Contains(envVars, new EnvironmentVariable("C", "C"));
+            Assert.Contains(envVars, new EnvironmentVariable("D", "D2"));
+            Assert.Contains(envVars, new EnvironmentVariable("E", "E"));
         }
 
         /// <summary>
@@ -151,11 +151,11 @@ namespace AirCannon.Framework.Tests.Models
             Assert.IsTrue(launcher.HasChanges, "Updating WorkingDirectory should cause HasChanges to be true");
 
             launcher.HasChanges = false;
-            launcher.EnvironmentVariables.Add("a", "a");
+            launcher.EnvironmentVariables.Add(new EnvironmentVariable("a", "b"));
             Assert.IsTrue(launcher.HasChanges, "New environment variables should cause HasChanges to be true");
 
             launcher.HasChanges = false;
-            launcher.EnvironmentVariables["a"] = "b";
+            launcher.EnvironmentVariables["a"] = "c";
             Assert.IsTrue(launcher.HasChanges, "Updating environment variables should cause HasChanges to be true");
         }
 
