@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 using Newtonsoft.Json;
+using IOFile=System.IO.File;
 
 namespace AirCannon.Framework.Models
 {
@@ -11,7 +15,7 @@ namespace AirCannon.Framework.Models
     ///   Settings for launching a given application.
     /// </summary>
     [DebuggerDisplay("{Name}")]
-    public class Launcher : NotifyPropertyChangedBase
+    public class Launcher : NotifyPropertyChangedBase, IDataErrorInfo
     {
         private string mArguments;
         private EnvironmentVariableCollection mEnvironmentVariables;
@@ -121,6 +125,49 @@ namespace AirCannon.Framework.Models
             get { return mWorkingDirectory; }
             set { HasChanges |= SetPropertyValue(ref mWorkingDirectory, value, () => WorkingDirectory); }
         }
+
+        #region IDataErrorInfo Members
+
+        /// <summary>
+        ///   Gets an error message indicating what is wrong with this object.
+        /// </summary>
+        /// <returns>An error message indicating what is wrong with this object. The default is an empty string ("").</returns>
+        public string Error
+        {
+            get { return null; }
+        }
+
+        /// <summary>
+        ///   Gets the error message for the property with the given name.
+        /// </summary>
+        /// <returns>The error message for the property. The default is an empty string ("").</returns>
+        public string this[string propertyName]
+        {
+            get
+            {
+                string error = null;
+
+                if (propertyName == Property.Name(() => File))
+                {
+                    if (!IOFile.Exists(File))
+                    {
+                        error = "File must exist.";
+                    }
+                }
+                else if (propertyName == Property.Name(() => WorkingDirectory))
+                {
+                    if (!string.IsNullOrEmpty(WorkingDirectory) && 
+                        !Directory.Exists(WorkingDirectory))
+                    {
+                        error = "Working directory must exist.";
+                    }
+                }
+
+                return error;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         ///   Gets all the environment variables to be used when launching this application, starting

@@ -25,6 +25,8 @@ namespace AirCannon.ViewModels
 
         private DelegateCommand mAddLaunchGroupCommand;
         private DelegateCommand mAddLauncherCommand;
+        private bool mIsExpanded;
+        private bool mIsSelected;
         private ReadOnlyWrappingCollection<LaunchGroupViewModel, LaunchGroup> mLaunchGroups;
         private ReadOnlyWrappingCollection<LauncherViewModel, Launcher> mLaunchers;
         private LaunchGroupViewModel mParent;
@@ -93,6 +95,38 @@ namespace AirCannon.ViewModels
         public bool HasChanges
         {
             get { return Model.HasChanges; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is expanded.
+        /// </summary>
+        public bool IsExpanded
+        {
+            get { return mIsExpanded; }
+            set
+            {
+                if (SetPropertyValue(ref mIsExpanded, value, () => IsExpanded) &&
+                    mIsExpanded && Parent != null)
+                {
+                    Parent.IsExpanded = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is selected.
+        /// </summary>
+        public bool IsSelected
+        {
+            get { return mIsSelected; }
+            set
+            {
+                if (SetPropertyValue(ref mIsSelected, value, () => IsSelected) &&
+                    mIsSelected && Parent != null)
+                {
+                    Parent.IsExpanded = true;
+                }
+            }
         }
 
         /// <summary>

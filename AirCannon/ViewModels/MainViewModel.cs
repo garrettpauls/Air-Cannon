@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Services;
@@ -86,6 +87,18 @@ namespace AirCannon.ViewModels
                 {
                     SaveCommand.RaiseCanExecuteChanged();
                     SaveAsCommand.RaiseCanExecuteChanged();
+                    if(Root != null)
+                    {
+                        var firstItem = Root.Children.First();
+                        if(firstItem is LauncherViewModel)
+                        {
+                            ((LauncherViewModel) firstItem).IsSelected = true;
+                        }
+                        else if(firstItem is LaunchGroupViewModel)
+                        {
+                            ((LaunchGroupViewModel) firstItem).IsSelected = true;
+                        }
+                    }
                 }
             }
         }

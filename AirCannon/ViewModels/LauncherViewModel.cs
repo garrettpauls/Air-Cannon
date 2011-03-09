@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
@@ -8,7 +10,7 @@ namespace AirCannon.ViewModels
     /// <summary>
     ///   A view model for the <see cref = "Launcher" /> class.
     /// </summary>
-    public class LauncherViewModel : ViewModelBase<Launcher>
+    public class LauncherViewModel : ViewModelBase<Launcher>, IDataErrorInfo
     {
         private static readonly string[] mPassthroughPropertyNames =
             new[]
@@ -20,6 +22,8 @@ namespace AirCannon.ViewModels
                     Property<LauncherViewModel>.Name(p => p.Name),
                     Property<LauncherViewModel>.Name(p => p.WorkingDirectory),
                 };
+
+        private bool mIsSelected;
 
         private DelegateCommand mLaunchCommand;
         private LaunchGroupViewModel mParent;
@@ -66,6 +70,37 @@ namespace AirCannon.ViewModels
         public bool HasChanges
         {
             get { return Model.HasChanges; }
+        }
+
+        /// <summary>
+        ///   Gets or sets a value indicating whether this instance is expanded.
+        /// </summary>
+        /// <remarks>
+        ///   This exists to avoid binding errors.
+        /// </remarks>
+        public bool IsExpanded
+        {
+            get { return false; }
+            set
+            {
+                // This has no children and can't be expanded.
+            }
+        }
+
+        /// <summary>
+        ///   Gets or sets a value indicating whether this instance is selected.
+        /// </summary>
+        public bool IsSelected
+        {
+            get { return mIsSelected; }
+            set
+            {
+                if (SetPropertyValue(ref mIsSelected, value, () => IsSelected) &&
+                    mIsSelected && Parent != null)
+                {
+                    Parent.IsExpanded = true;
+                }
+            }
         }
 
         /// <summary>
@@ -117,6 +152,28 @@ namespace AirCannon.ViewModels
             get { return Model.WorkingDirectory; }
             set { Model.WorkingDirectory = value; }
         }
+
+        #region IDataErrorInfo Members
+
+        /// <summary>
+        ///   Gets an error message indicating what is wrong with this object.
+        /// </summary>
+        /// <returns>An error message indicating what is wrong with this object. The default is an empty string ("").</returns>
+        public string Error
+        {
+            get { return Model.Error; }
+        }
+
+        /// <summary>
+        ///   Gets the error message for the property with the given name.
+        /// </summary>
+        /// <returns>The error message for the property. The default is an empty string ("").</returns>
+        public string this[string propertyName]
+        {
+            get { return Model[propertyName]; }
+        }
+
+        #endregion
 
         /// <summary>
         ///   Called when a property on the model is changed. 

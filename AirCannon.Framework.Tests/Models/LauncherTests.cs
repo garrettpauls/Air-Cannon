@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Tests.Utilities;
+using AirCannon.Framework.Utilities;
 using MbUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Models
@@ -127,6 +130,39 @@ namespace AirCannon.Framework.Tests.Models
         }
 
         /// <summary>
+        ///   Verifies the File property validates correctly.
+        /// </summary>
+        [Test]
+        public void FileValidationTest()
+        {
+            Launcher launcher = new Launcher();
+            launcher.File = string.Empty;
+
+            var fileError = launcher[Property<Launcher>.Name(p => p.File)];
+
+            Assert.IsFalse(string.IsNullOrEmpty(fileError), "The File property should cause an error when empty");
+
+            string nonexistentFile;
+            do
+            {
+                nonexistentFile = Guid.NewGuid().ToString();
+            } while (File.Exists(nonexistentFile));
+
+            launcher.File = nonexistentFile;
+            fileError = launcher[Property<Launcher>.Name(p => p.File)];
+            Assert.IsFalse(string.IsNullOrEmpty(fileError),
+                           "The File property should cause an error when the file doesn't exist");
+
+            launcher.File = _GetExistingFilePath();
+            fileError = launcher[Property<Launcher>.Name(p => p.File)];
+            Assert.IsTrue(File.Exists(launcher.File),
+                          "The file {0} must exist for this test to complete successfully",
+                          launcher.File);
+            Assert.IsTrue(string.IsNullOrEmpty(fileError),
+                          "The File property should not cause an error when the file exists");
+        }
+
+        /// <summary>
         ///   Verifies the <see cref = "Launcher.HasChanges" /> property works correctly.
         /// </summary>
         [Test]
@@ -212,6 +248,45 @@ namespace AirCannon.Framework.Tests.Models
                            "Test cleanup - Temporary directory '{0}' could not be deleted", mTempDir);
 
             mTempDir = string.Empty;
+        }
+
+        /// <summary>
+        ///   Verifies the WorkingDirectory property validates correctly.
+        /// </summary>
+        [Test]
+        public void WorkingDirectoryValidationTest()
+        {
+            Launcher launcher = new Launcher();
+            launcher.WorkingDirectory = string.Empty;
+
+            var wdError = launcher[Property<Launcher>.Name(p => p.WorkingDirectory)];
+
+            Assert.IsTrue(string.IsNullOrEmpty(wdError),
+                          "The WorkingDirectory property should not cause an error if it is empty");
+
+            string nonexistentDirectory;
+            do
+            {
+                nonexistentDirectory = Guid.NewGuid().ToString();
+            } while (Directory.Exists(nonexistentDirectory));
+
+            launcher.WorkingDirectory = nonexistentDirectory;
+            wdError = launcher[Property<Launcher>.Name(p => p.WorkingDirectory)];
+            Assert.IsFalse(string.IsNullOrEmpty(wdError),
+                           "The WorkingDirectory property should cause an error when the directory doesn't exist");
+
+            launcher.WorkingDirectory = Path.GetDirectoryName(_GetExistingFilePath());
+            wdError = launcher[Property<Launcher>.Name(p => p.WorkingDirectory)];
+            Assert.IsTrue(Directory.Exists(launcher.WorkingDirectory),
+                          "The directory {0} must exist for this test to complete successfully",
+                          launcher.WorkingDirectory);
+            Assert.IsTrue(string.IsNullOrEmpty(wdError),
+                          "The WorkingDirectory property should not cause an error when the directory exists");
+        }
+
+        private string _GetExistingFilePath()
+        {
+            return new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
         }
     }
 }
