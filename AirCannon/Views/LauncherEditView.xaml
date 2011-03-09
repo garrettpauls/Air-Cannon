@@ -11,8 +11,9 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="*" />
@@ -36,5 +37,9 @@
 
 		<Views:EnvironmentVariableEditView Grid.Row="4" Grid.ColumnSpan="2"
 		                                   DataContext="{Binding Path=EnvironmentVariables}" />
+        
+        <Button Content="Launch" HorizontalAlignment="Right" Command="{Binding LaunchCommand}"
+                Margin="2" Padding="5 0 5 0" MinWidth="75" IsDefault="True"
+                Grid.Row="5" Grid.Column="1" />
 	</Grid>
 </UserControl>

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
@@ -21,6 +23,8 @@ namespace AirCannon.ViewModels
                     Property<LaunchGroupViewModel>.Name(p => p.Name),
                 };
 
+        private DelegateCommand mAddLaunchGroupCommand;
+        private DelegateCommand mAddLauncherCommand;
         private ReadOnlyWrappingCollection<LaunchGroupViewModel, LaunchGroup> mLaunchGroups;
         private ReadOnlyWrappingCollection<LauncherViewModel, Launcher> mLaunchers;
         private LaunchGroupViewModel mParent;
@@ -32,6 +36,36 @@ namespace AirCannon.ViewModels
         public LaunchGroupViewModel(LaunchGroup model)
         {
             Model = model;
+        }
+
+        /// <summary>
+        ///   Gets the command to add a new launch group.
+        /// </summary>
+        public DelegateCommand AddLaunchGroupCommand
+        {
+            get
+            {
+                if (mAddLaunchGroupCommand == null)
+                {
+                    mAddLaunchGroupCommand = new DelegateCommand(_AddLaunchGroup);
+                }
+                return mAddLaunchGroupCommand;
+            }
+        }
+
+        /// <summary>
+        ///   Gets the command to add a new launcher.
+        /// </summary>
+        public DelegateCommand AddLauncherCommand
+        {
+            get
+            {
+                if (mAddLauncherCommand == null)
+                {
+                    mAddLauncherCommand = new DelegateCommand(_AddLauncher);
+                }
+                return mAddLauncherCommand;
+            }
         }
 
         /// <summary>
@@ -72,6 +106,7 @@ namespace AirCannon.ViewModels
                 {
                     mLaunchGroups = new ReadOnlyWrappingCollection<LaunchGroupViewModel, LaunchGroup>(
                         Model.Groups, group => new LaunchGroupViewModel(group), vm => vm.Model);
+                    mLaunchGroups.CollectionChanged += _HandleChildCollectionChanged;
                 }
 
                 return mLaunchGroups;
@@ -89,6 +124,7 @@ namespace AirCannon.ViewModels
                 {
                     mLaunchers = new ReadOnlyWrappingCollection<LauncherViewModel, Launcher>(
                         Model.Launchers, launcher => new LauncherViewModel(launcher), vm => vm.Model);
+                    mLaunchers.CollectionChanged += _HandleChildCollectionChanged;
                 }
                 return mLaunchers;
             }
@@ -120,8 +156,6 @@ namespace AirCannon.ViewModels
             get { return mPassthroughPropertyNames; }
         }
 
-        #region Overrides of ViewModelBase<LaunchGroup>
-
         /// <summary>
         ///   Called when a model property is changed. Used to pass through property changed events.
         /// </summary>
@@ -131,15 +165,41 @@ namespace AirCannon.ViewModels
             {
                 Parent = new LaunchGroupViewModel(Model.Parent);
             }
-            else if (propertyName == Property<LaunchGroup>.Name(p => p.Groups) ||
-                     propertyName == Property<LaunchGroup>.Name(p => p.Launchers))
-            {
-                RaisePropertyChanged(() => Children);
-            }
 
             base.OnBasePropertyChanged(propertyName);
         }
 
-        #endregion
+        /// <summary>
+        ///   Adds a new launch group.
+        /// </summary>
+        private void _AddLaunchGroup()
+        {
+            Model.Groups.Add(new LaunchGroup(Model)
+                                 {
+                                     Name = "New launch group"
+                                 });
+        }
+
+        /// <summary>
+        ///   Adds a launcher to this group.
+        /// </summary>
+        private void _AddLauncher()
+        {
+            Model.Launchers.Add(new Launcher(Model)
+                                    {
+                                        Name = "New launcher"
+                                    });
+        }
+
+        /// <summary>
+        ///   Whenever one of the collections that is included in <see cref = "Children" /> changes,
+        ///   we have to raise the Children property changed event.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleChildCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged(() => Children);
+        }
     }
 }

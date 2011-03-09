@@ -226,6 +226,7 @@ namespace AirCannon.Framework.Models
         {
             var startInfo = new ProcessStartInfo(File, Arguments);
             startInfo.WorkingDirectory = WorkingDirectory;
+            startInfo.UseShellExecute = false;
 
             foreach (var envVar in AggregateEnvironmentVariables())
             {

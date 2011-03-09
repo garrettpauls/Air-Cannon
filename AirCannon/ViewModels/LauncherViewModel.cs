@@ -21,6 +21,7 @@ namespace AirCannon.ViewModels
                     Property<LauncherViewModel>.Name(p => p.WorkingDirectory),
                 };
 
+        private DelegateCommand mLaunchCommand;
         private LaunchGroupViewModel mParent;
 
         /// <summary>
@@ -68,6 +69,21 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
+        ///   Gets the launch command to launch the launcher.
+        /// </summary>
+        public DelegateCommand LaunchCommand
+        {
+            get
+            {
+                if (mLaunchCommand == null)
+                {
+                    mLaunchCommand = new DelegateCommand(() => Model.Launch());
+                }
+                return mLaunchCommand;
+            }
+        }
+
+        /// <summary>
         ///   Gets or sets the name to describe this launcher.
         /// </summary>
         public string Name
@@ -102,8 +118,6 @@ namespace AirCannon.ViewModels
             set { Model.WorkingDirectory = value; }
         }
 
-        #region Overrides of ViewModelBase<Launcher>
-
         /// <summary>
         ///   Called when a property on the model is changed. 
         ///   Used to pass through property changed events and
@@ -118,7 +132,5 @@ namespace AirCannon.ViewModels
 
             base.OnBasePropertyChanged(propertyName);
         }
-
-        #endregion
     }
 }
