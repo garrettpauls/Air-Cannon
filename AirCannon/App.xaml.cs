@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
+﻿using System.Reflection;
 using System.Windows;
 using AirCannon.Framework.Services;
 using AirCannon.Properties;
@@ -15,6 +11,24 @@ namespace AirCannon
     /// </summary>
     public partial class App : Application
     {
+        private static string mVersion;
+
+        /// <summary>
+        ///   Gets the version of the application.
+        /// </summary>
+        public static string Version
+        {
+            get
+            {
+                if (mVersion == null)
+                {
+                    Assembly assembly = Assembly.GetEntryAssembly();
+                    mVersion = assembly.GetName().Version.ToString();
+                }
+                return mVersion;
+            }
+        }
+
         /// <summary>
         ///   Handles the Exit event of the application.
         /// </summary>

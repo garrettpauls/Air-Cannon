@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="AirCannon.Views.MainView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:Views="clr-namespace:AirCannon.Views" xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
+             xmlns:Views="clr-namespace:AirCannon.Views" xmlns:ViewModels="clr-namespace:AirCannon.ViewModels" xmlns:Controls="clr-namespace:AirCannon.Controls"
              MinWidth="400" MinHeight="300">
 	<UserControl.Resources>
 		<Style TargetType="GridSplitter" x:Key="ColumnGridSplitter">
@@ -22,7 +22,7 @@
 			<ColumnDefinition Width="*" MinWidth="100" />
 		</Grid.ColumnDefinitions>
 		<Views:MenuView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding}" />
-		<Views:LauncherTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Path=Root.Children}" x:Name="mLauncherTreeView" />
+		<Views:LauncherTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Path=Root}" x:Name="mLauncherTreeView" />
 		<GridSplitter Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=ColumnGridSplitter}"
 		              HorizontalAlignment="Stretch" />
 		<ContentPresenter Grid.Row="1" Grid.Column="2" Content="{Binding ElementName=mLauncherTreeView, Path=SelectedItem}">
@@ -35,5 +35,5 @@
 				</DataTemplate>
 			</ContentPresenter.Resources>
 		</ContentPresenter>
-	</Grid>
+    </Grid>
 </UserControl>

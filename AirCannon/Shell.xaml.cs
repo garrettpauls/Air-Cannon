@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace AirCannon
 {
     /// <summary>
-    /// Interaction logic for Shell.xaml
+    ///   Interaction logic for Shell.xaml
     /// </summary>
     public partial class Shell : Window
     {
@@ -26,6 +17,22 @@ namespace AirCannon
             _DebugHook();
         }
 
+        /// <summary>
+        ///   When a debugger is attached and control is held, clicking executes a breakpoint.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Windows.Input.MouseButtonEventArgs" /> instance containing the event data.</param>
+        private static void _DebugHandleMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Debugger.IsAttached &&
+                Keyboard.Modifiers == ModifierKeys.Control &&
+                e.LeftButton == MouseButtonState.Pressed)
+            {
+                var elementOver = Mouse.DirectlyOver;
+                Debugger.Break();
+            }
+        }
+
         [Conditional("DEBUG")]
         private void _DebugHook()
         {
@@ -33,19 +40,31 @@ namespace AirCannon
         }
 
         /// <summary>
-        /// When a debugger is attached and control is held, clicking executes a breakpoint.
+        ///   Handles the NotifyIconDoubleClick event of the notify icon.
+        ///   Used to toggle window visibility.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Input.MouseButtonEventArgs"/> instance containing the event data.</param>
-        private void _DebugHandleMouseDown(object sender, MouseButtonEventArgs e)
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Windows.RoutedEventArgs" /> instance containing the event data.</param>
+        private void _HandleNotifyIconDoubleClick(object sender, RoutedEventArgs e)
         {
-            if (Debugger.IsAttached && 
-                Keyboard.Modifiers == ModifierKeys.Control &&
-                e.LeftButton == MouseButtonState.Pressed)
+            if (Visibility == Visibility.Visible)
             {
-                var elementOver = Mouse.DirectlyOver;
-                Debugger.Break();
+                Hide();
             }
+            else
+            {
+                Show();
+            }
+        }
+
+        /// <summary>
+        ///   Handles the NotifyIconLeftClick event of the notify icon.
+        ///   Used to show the launch context menu.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Windows.RoutedEventArgs" /> instance containing the event data.</param>
+        private void _HandleNotifyIconLeftClick(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

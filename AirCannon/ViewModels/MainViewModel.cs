@@ -2,10 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Shell;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Services;
 using AirCannon.Framework.WPF;
 using AirCannon.Properties;
+using AirCannon.Views;
 
 namespace AirCannon.ViewModels
 {
@@ -21,6 +23,7 @@ namespace AirCannon.ViewModels
         private LaunchGroupViewModel mRoot;
         private DelegateCommand mSaveAsCommand;
         private DelegateCommand mSaveCommand;
+        private DelegateCommand mShowAboutCommand;
 
         /// <summary>
         ///   Initializes a new instance of the <see cref = "MainViewModel" /> class.
@@ -87,14 +90,14 @@ namespace AirCannon.ViewModels
                 {
                     SaveCommand.RaiseCanExecuteChanged();
                     SaveAsCommand.RaiseCanExecuteChanged();
-                    if(Root != null)
+                    if (Root != null)
                     {
-                        var firstItem = Root.Children.First();
-                        if(firstItem is LauncherViewModel)
+                        var firstItem = Root.Children.FirstOrDefault();
+                        if (firstItem is LauncherViewModel)
                         {
                             ((LauncherViewModel) firstItem).IsSelected = true;
                         }
-                        else if(firstItem is LaunchGroupViewModel)
+                        else if (firstItem is LaunchGroupViewModel)
                         {
                             ((LaunchGroupViewModel) firstItem).IsSelected = true;
                         }
@@ -130,6 +133,21 @@ namespace AirCannon.ViewModels
                     mSaveCommand = new DelegateCommand(() => _Save(), _CanSave);
                 }
                 return mSaveCommand;
+            }
+        }
+
+        /// <summary>
+        ///   Gets a command to show the about dialog.
+        /// </summary>
+        public DelegateCommand ShowAboutCommand
+        {
+            get
+            {
+                if (mShowAboutCommand == null)
+                {
+                    return mShowAboutCommand = new DelegateCommand(_ShowAbout);
+                }
+                return mShowAboutCommand;
             }
         }
 
@@ -249,6 +267,22 @@ You can save your changes, discard them, or cancel the current operation.",
 
             Settings.Default.CurrentFile = file;
             return _Save();
+        }
+
+        /// <summary>
+        ///   Shows the about dialog.
+        /// </summary>
+        private static void _ShowAbout()
+        {
+            Window window = new Window();
+            window.Title = "About";
+            window.SizeToContent = SizeToContent.WidthAndHeight;
+            window.Content = new AboutView();
+            window.ResizeMode = ResizeMode.NoResize;
+            window.Icon = Application.Current.MainWindow.Icon;
+            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            window.Owner = Application.Current.MainWindow;
+            window.ShowDialog();
         }
     }
 }

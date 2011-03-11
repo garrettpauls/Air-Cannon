@@ -2,16 +2,21 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Views="clr-namespace:AirCannon.Views"
-        xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
-        Title="Air Cannon" SizeToContent="WidthAndHeight">
+        xmlns:ViewModels="clr-namespace:AirCannon.ViewModels" xmlns:Controls="clr-namespace:AirCannon.Controls"
+        Title="Air Cannon" SizeToContent="WidthAndHeight"
+        Icon="/Resources/Icons/application_go.png">
 	<Window.DataContext>
-		<ViewModels:MainViewModel x:Name="mMainViewModel"/>
+		<ViewModels:MainViewModel x:Name="mMainViewModel" />
 	</Window.DataContext>
 	<Window.InputBindings>
-        <KeyBinding Command="{Binding NewCommand}" Key="N" Modifiers="Control" />
-        <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Control" />
-        <KeyBinding Command="{Binding SaveAsCommand}" Key="S" Modifiers="Control+Shift" />
-        <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Control" />
-    </Window.InputBindings>
-	<Views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+		<KeyBinding Command="{Binding NewCommand}" Key="N" Modifiers="Control" />
+		<KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Control" />
+		<KeyBinding Command="{Binding SaveAsCommand}" Key="S" Modifiers="Control+Shift" />
+		<KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Control" />
+	</Window.InputBindings>
+	<Grid>
+		<Views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+		<Controls:NotifyIconAdapter NotifyIconDoubleClick="_HandleNotifyIconDoubleClick"
+		                            NotifyIconRightClick="_HandleNotifyIconLeftClick" />
+	</Grid>
 </Window>
