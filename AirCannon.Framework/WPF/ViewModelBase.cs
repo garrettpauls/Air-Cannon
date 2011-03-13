@@ -54,7 +54,7 @@ namespace AirCannon.Framework.WPF
         {
             if (PassthroughPropertyNames.Contains(propertyName))
             {
-                RaisePropertyChanged(propertyName);
+                OnPropertyChanged(propertyName);
             }
         }
 

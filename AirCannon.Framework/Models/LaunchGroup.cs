@@ -85,7 +85,7 @@ namespace AirCannon.Framework.Models
                         mEnvironmentVariables.ItemChanged += _HandleEnvironmentVariableChanged;
                     }
 
-                    RaisePropertyChanged(() => EnvironmentVariables);
+                    OnPropertyChanged(() => EnvironmentVariables);
                     HasChanges = true;
                 }
             }

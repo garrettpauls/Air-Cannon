@@ -21,6 +21,7 @@ namespace AirCannon.Framework.Models
         private EnvironmentVariableCollection mEnvironmentVariables;
         private string mFile;
         private bool mHasChanges;
+        private bool mIsValid;
         private string mName;
         private LaunchGroup mParent;
         private string mWorkingDirectory;
@@ -73,7 +74,7 @@ namespace AirCannon.Framework.Models
                         mEnvironmentVariables.ItemChanged += _HandleEnvironmentVariableChanged;
                     }
 
-                    RaisePropertyChanged(() => EnvironmentVariables);
+                    OnPropertyChanged(() => EnvironmentVariables);
                     HasChanges = true;
                 }
             }
@@ -96,6 +97,15 @@ namespace AirCannon.Framework.Models
         {
             get { return mHasChanges; }
             set { SetPropertyValue(ref mHasChanges, value, () => HasChanges); }
+        }
+
+        /// <summary>
+        ///   Gets a value indicating whether this instance is valid and can launch.
+        /// </summary>
+        public bool IsValid
+        {
+            get { return mIsValid; }
+            private set { SetPropertyValue(ref mIsValid, value, () => IsValid); }
         }
 
         /// <summary>
@@ -156,7 +166,7 @@ namespace AirCannon.Framework.Models
                 }
                 else if (propertyName == Property.Name(() => WorkingDirectory))
                 {
-                    if (!string.IsNullOrEmpty(WorkingDirectory) && 
+                    if (!string.IsNullOrEmpty(WorkingDirectory) &&
                         !Directory.Exists(WorkingDirectory))
                     {
                         error = "Working directory must exist.";
@@ -281,6 +291,21 @@ namespace AirCannon.Framework.Models
             }
 
             return Process.Start(startInfo);
+        }
+
+        /// <summary>
+        ///   Raises the property changed event with the given property.
+        /// </summary>
+        protected override void OnPropertyChanged(string property)
+        {
+            base.OnPropertyChanged(property);
+
+            if (property == Property.Name(() => File) ||
+                property == Property.Name(() => WorkingDirectory))
+            {
+                IsValid = string.IsNullOrEmpty(this[Property.Name(() => File)]) &&
+                          string.IsNullOrEmpty(this[Property.Name(() => WorkingDirectory)]);
+            }
         }
 
         /// <summary>

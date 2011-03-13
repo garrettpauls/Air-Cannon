@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Shell;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Services;
 using AirCannon.Framework.WPF;
@@ -24,6 +22,7 @@ namespace AirCannon.ViewModels
         private DelegateCommand mSaveAsCommand;
         private DelegateCommand mSaveCommand;
         private DelegateCommand mShowAboutCommand;
+        private DelegateCommand mToggleMainWindowCommand;
 
         /// <summary>
         ///   Initializes a new instance of the <see cref = "MainViewModel" /> class.
@@ -151,12 +150,33 @@ namespace AirCannon.ViewModels
             }
         }
 
+        public DelegateCommand ToggleMainWindowCommand
+        {
+            get
+            {
+                if (mToggleMainWindowCommand == null)
+                {
+                    mToggleMainWindowCommand = new DelegateCommand(_ToggleMainWindow, _CanToggleMainWindow);
+                }
+                return mToggleMainWindowCommand;
+            }
+        }
+
         /// <summary>
         ///   Determines if the user can save.
         /// </summary>
         private bool _CanSave()
         {
             return Root != null;
+        }
+
+        /// <summary>
+        ///   Determines if the main window's visiblity can be toggled.
+        /// </summary>
+        /// <returns></returns>
+        private bool _CanToggleMainWindow()
+        {
+            return Application.Current.MainWindow != null;
         }
 
         /// <summary>
@@ -283,6 +303,21 @@ You can save your changes, discard them, or cancel the current operation.",
             window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             window.Owner = Application.Current.MainWindow;
             window.ShowDialog();
+        }
+
+        /// <summary>
+        ///   Toggles the visibility of the main window.
+        /// </summary>
+        private void _ToggleMainWindow()
+        {
+            if (Application.Current.MainWindow.Visibility == Visibility.Visible)
+            {
+                Application.Current.MainWindow.Hide();
+            }
+            else
+            {
+                Application.Current.MainWindow.Show();
+            }
         }
     }
 }

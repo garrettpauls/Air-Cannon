@@ -39,14 +39,14 @@ namespace AirCannon.Framework.Tests.WPF
         }
 
         /// <summary>
-        ///   Verifies that the <see cref = "NotifyPropertyChangedBase.RaisePropertyChanged{TProp}" /> 
+        ///   Verifies that the <see cref = "NotifyPropertyChangedBase.OnPropertyChanged{TProp}" /> 
         ///   method works correctly.
         /// </summary>
         [Test]
         public void RaisePropertyChangedTest()
         {
-            RaisePropertyChanged(() => TestProperty);
-            RaisePropertyChanged(() => OtherTestProperty);
+            OnPropertyChanged(() => TestProperty);
+            OnPropertyChanged(() => OtherTestProperty);
 
             Assert.Count(2, mChangedProperties, "Two properties should have been changed");
             Assert.AreEqual(TEST_PROPERTY_NAME, mChangedProperties[0], "{0} should have been raised first",

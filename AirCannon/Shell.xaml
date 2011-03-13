@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Views="clr-namespace:AirCannon.Views"
-        xmlns:ViewModels="clr-namespace:AirCannon.ViewModels" xmlns:Controls="clr-namespace:AirCannon.Controls"
+        xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
+        xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification"
         Title="Air Cannon" SizeToContent="WidthAndHeight"
         Icon="/Resources/Icons/application_go.png">
 	<Window.DataContext>
@@ -16,7 +17,26 @@
 	</Window.InputBindings>
 	<Grid>
 		<Views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-		<Controls:NotifyIconAdapter NotifyIconDoubleClick="_HandleNotifyIconDoubleClick"
-		                            NotifyIconRightClick="_HandleNotifyIconLeftClick" />
+		<HC:TaskbarIcon IconSource="Resources/Icons/application_go.ico" 
+                        DoubleClickCommand="{Binding Path=ToggleMainWindowCommandToggleMainWindowCommand}">
+			<HC:TaskbarIcon.ContextMenu>
+				<ContextMenu ItemsSource="{Binding Path=Root.Children}">
+					<ContextMenu.Resources>
+						<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
+                            <TextBlock Text="{Binding Path=Name}" />
+						</DataTemplate>
+						<HierarchicalDataTemplate DataType="{x:Type ViewModels:LaunchGroupViewModel}"
+						                          ItemsSource="{Binding Path=Children}">
+                            <TextBlock Text="{Binding Path=Name}" />
+						</HierarchicalDataTemplate>
+                    </ContextMenu.Resources>
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Command" Value="{Binding Path=LaunchCommand}" />
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
+                </ContextMenu>
+			</HC:TaskbarIcon.ContextMenu>
+		</HC:TaskbarIcon>
 	</Grid>
 </Window>

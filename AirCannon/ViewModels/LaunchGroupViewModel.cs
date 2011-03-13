@@ -233,7 +233,7 @@ namespace AirCannon.ViewModels
         /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
         private void _HandleChildCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            RaisePropertyChanged(() => Children);
+            OnPropertyChanged(() => Children);
         }
     }
 }

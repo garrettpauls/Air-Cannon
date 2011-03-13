@@ -112,7 +112,7 @@ namespace AirCannon.ViewModels
             {
                 if (mLaunchCommand == null)
                 {
-                    mLaunchCommand = new DelegateCommand(() => Model.Launch());
+                    mLaunchCommand = new DelegateCommand(_Launch, _CanLaunch);
                 }
                 return mLaunchCommand;
             }
@@ -186,8 +186,28 @@ namespace AirCannon.ViewModels
             {
                 Parent = new LaunchGroupViewModel(Model.Parent);
             }
+            else if(propertyName == Property<Launcher>.Name(p => p.IsValid))
+            {
+                LaunchCommand.RaiseCanExecuteChanged();
+            }
 
             base.OnBasePropertyChanged(propertyName);
+        }
+
+        /// <summary>
+        ///   Determines if this instance can launch.
+        /// </summary>
+        private bool _CanLaunch()
+        {
+            return Model.IsValid;
+        }
+
+        /// <summary>
+        ///   Launches this instance.
+        /// </summary>
+        private void _Launch()
+        {
+            Model.Launch();
         }
     }
 }

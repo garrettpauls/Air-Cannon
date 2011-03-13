@@ -19,17 +19,17 @@ namespace AirCannon.Framework.WPF
         ///   () => SomeProperty
         /// </param>
         /// <example>
-        ///   this.RaisePropertyChanged(() => ChangedProperty);
+        ///   this.OnPropertyChanged(() => ChangedProperty);
         /// </example>
-        protected void RaisePropertyChanged<TProp>(Expression<Func<TProp>> propertySelector)
+        protected void OnPropertyChanged<TProp>(Expression<Func<TProp>> propertySelector)
         {
-            RaisePropertyChanged(Property.Name(propertySelector));
+            OnPropertyChanged(Property.Name(propertySelector));
         }
 
         /// <summary>
         ///   Raises the property changed event with the given property.
         /// </summary>
-        protected void RaisePropertyChanged(string property)
+        protected virtual void OnPropertyChanged(string property)
         {
             var temp = PropertyChanged;
             if (temp != null)
@@ -60,7 +60,7 @@ namespace AirCannon.Framework.WPF
             if (!Equals(backingField, value))
             {
                 backingField = value;
-                RaisePropertyChanged(propertySelector);
+                OnPropertyChanged(propertySelector);
                 return true;
             }
 
