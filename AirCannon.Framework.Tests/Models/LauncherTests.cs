@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using AirCannon.Framework.Models;
-using AirCannon.Framework.Tests.Utilities;
 using AirCannon.Framework.Utilities;
 using MbUnit.Framework;
 
@@ -217,6 +215,46 @@ namespace AirCannon.Framework.Tests.Models
 
             Assert.IsTrue(process.HasExited, "Process should have exited");
             Assert.IsTrue(File.Exists(testFilePath), "Process should have created the file '{0}'", testFilePath);
+        }
+
+        /// <summary>
+        ///   Verifies the Launcher runs a script with the correct environment variables.
+        /// </summary>
+        [Test, Timeout(60)]
+        public void LaunchWithEnvironmentVariablesTest()
+        {
+            const string SCRIPT_NAME = "test.bat";
+            string scriptPath = Path.Combine(mTempDir, SCRIPT_NAME);
+            string testFilePath = Path.Combine(mTempDir, "test.txt");
+            string script = @"
+@echo %v1%>>""" + testFilePath + @"""
+@echo %v2%>>""" + testFilePath +
+                            @"""
+@echo %v3%>>""" + testFilePath + @"""";
+
+            var v1 = new EnvironmentVariable("v1", "{E16620DD-D150-4F2C-B4AE-DBC54E72373C}");
+            var v2 = new EnvironmentVariable("v2", "{4EB5E514-BF79-43B1-A535-0BB5AAD4D60F}");
+            var v3 = new EnvironmentVariable("v3", "{9DD27426-93AF-46D0-81DE-4073EDBC7664}");
+
+            File.WriteAllText(scriptPath, script);
+
+            Launcher launcher = new Launcher();
+            launcher.File = scriptPath;
+            launcher.EnvironmentVariables.Add(v1);
+            launcher.EnvironmentVariables.Add(v2);
+            launcher.EnvironmentVariables.Add(v3);
+
+            Process process = launcher.Launch();
+            process.WaitForExit();
+
+            Assert.IsTrue(process.HasExited, "Process should have exited");
+            Assert.IsTrue(File.Exists(testFilePath), "Process should have created the file '{0}'", testFilePath);
+
+            string[] contents = File.ReadAllLines(testFilePath);
+            Assert.Count(3, contents, "There should have been three lines in the output file");
+            Assert.AreEqual(v1.Value, contents[0], "The first environment variable value was wrong");
+            Assert.AreEqual(v2.Value, contents[1], "The second environment variable value was wrong");
+            Assert.AreEqual(v3.Value, contents[2], "The third environment variable value was wrong");
         }
 
         /// <summary>

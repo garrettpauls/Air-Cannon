@@ -84,6 +84,7 @@
     <Compile Include="WPF\DelegateCommand.cs" />
     <Compile Include="WPF\NotifyPropertyChangedBase.cs" />
     <Compile Include="WPF\ReadOnlyWrappingCollection.cs" />
+    <Compile Include="WPF\TypedStyleSelector.cs" />
     <Compile Include="WPF\ViewModelBase.cs" />
   </ItemGroup>
   <ItemGroup />

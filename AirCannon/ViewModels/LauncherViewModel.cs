@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
+using IOFile=System.IO.File;
 
 namespace AirCannon.ViewModels
 {
@@ -19,14 +22,35 @@ namespace AirCannon.ViewModels
                     Property<LauncherViewModel>.Name(p => p.EnvironmentVariables),
                     Property<LauncherViewModel>.Name(p => p.File),
                     Property<LauncherViewModel>.Name(p => p.HasChanges),
+                    Property<LauncherViewModel>.Name(p => p.IsValid),
                     Property<LauncherViewModel>.Name(p => p.Name),
                     Property<LauncherViewModel>.Name(p => p.WorkingDirectory),
                 };
 
+        private static readonly Image LAUNCHER_ICON;
+        private static readonly Image DISABLED_LAUNCHER_ICON;
+        private Image mIcon;
         private bool mIsSelected;
-
         private DelegateCommand mLaunchCommand;
         private LaunchGroupViewModel mParent;
+
+        /// <summary>
+        ///   Initializes the <see cref = "LauncherViewModel" /> class.
+        /// </summary>
+        static LauncherViewModel()
+        {
+            LAUNCHER_ICON =
+                new Image
+                    {
+                        Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/bullet_go.png"))
+                    };
+            DISABLED_LAUNCHER_ICON =
+                new Image
+                    {
+                        Source =
+                            new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/bullet_go_disabled.png"))
+                    };
+        }
 
         /// <summary>
         ///   Initializes a new instance of the <see cref = "LauncherViewModel" /> class.
@@ -36,6 +60,7 @@ namespace AirCannon.ViewModels
         {
             Model = launcher;
             Parent = new LaunchGroupViewModel(Model.Parent);
+            _UpdateIcon();
         }
 
         /// <summary>
@@ -61,7 +86,14 @@ namespace AirCannon.ViewModels
         public string File
         {
             get { return Model.File; }
-            set { Model.File = value; }
+            set
+            {
+                if (Model.File != value)
+                {
+                    Model.File = value;
+                    _UpdateIcon();
+                }
+            }
         }
 
         /// <summary>
@@ -70,6 +102,15 @@ namespace AirCannon.ViewModels
         public bool HasChanges
         {
             get { return Model.HasChanges; }
+        }
+
+        /// <summary>
+        ///   Gets the icon representing this launcher.
+        /// </summary>
+        public Image Icon
+        {
+            get { return mIcon; }
+            private set { SetPropertyValue(ref mIcon, value, () => Icon); }
         }
 
         /// <summary>
@@ -101,6 +142,14 @@ namespace AirCannon.ViewModels
                     Parent.IsExpanded = true;
                 }
             }
+        }
+
+        /// <summary>
+        ///   Gets a value indicating whether this instance is valid.
+        /// </summary>
+        public bool IsValid
+        {
+            get { return Model.IsValid; }
         }
 
         /// <summary>
@@ -186,7 +235,7 @@ namespace AirCannon.ViewModels
             {
                 Parent = new LaunchGroupViewModel(Model.Parent);
             }
-            else if(propertyName == Property<Launcher>.Name(p => p.IsValid))
+            else if (propertyName == Property<Launcher>.Name(p => p.IsValid))
             {
                 LaunchCommand.RaiseCanExecuteChanged();
             }
@@ -208,6 +257,21 @@ namespace AirCannon.ViewModels
         private void _Launch()
         {
             Model.Launch();
+        }
+
+        /// <summary>
+        ///   Updates the icon based on the file.
+        /// </summary>
+        private void _UpdateIcon()
+        {
+            if (IOFile.Exists(File))
+            {
+                Icon = LAUNCHER_ICON;
+            }
+            else
+            {
+                Icon = DISABLED_LAUNCHER_ICON;
+            }
         }
     }
 }

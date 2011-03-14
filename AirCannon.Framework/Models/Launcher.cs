@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 using Newtonsoft.Json;
@@ -19,6 +20,7 @@ namespace AirCannon.Framework.Models
     {
         private string mArguments;
         private EnvironmentVariableCollection mEnvironmentVariables;
+        private string mError;
         private string mFile;
         private bool mHasChanges;
         private bool mIsValid;
@@ -86,7 +88,14 @@ namespace AirCannon.Framework.Models
         public string File
         {
             get { return mFile; }
-            set { HasChanges |= SetPropertyValue(ref mFile, value, () => File); }
+            set
+            {
+                if (SetPropertyValue(ref mFile, value, () => File))
+                {
+                    HasChanges = true;
+                    _UpdateError();
+                }
+            }
         }
 
         /// <summary>
@@ -133,7 +142,14 @@ namespace AirCannon.Framework.Models
         public string WorkingDirectory
         {
             get { return mWorkingDirectory; }
-            set { HasChanges |= SetPropertyValue(ref mWorkingDirectory, value, () => WorkingDirectory); }
+            set
+            {
+                if (SetPropertyValue(ref mWorkingDirectory, value, () => WorkingDirectory))
+                {
+                    HasChanges = true;
+                    _UpdateError();
+                }
+            }
         }
 
         #region IDataErrorInfo Members
@@ -144,7 +160,8 @@ namespace AirCannon.Framework.Models
         /// <returns>An error message indicating what is wrong with this object. The default is an empty string ("").</returns>
         public string Error
         {
-            get { return null; }
+            get { return mError; }
+            private set { SetPropertyValue(ref mError, value, () => Error); }
         }
 
         /// <summary>
@@ -326,6 +343,24 @@ namespace AirCannon.Framework.Models
         private void _HandleEnvironmentVariablesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             HasChanges = true;
+        }
+
+        /// <summary>
+        ///   Updates the main error message.
+        /// </summary>
+        private void _UpdateError()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(this[Property.Name(() => File)]);
+            sb.AppendLine(this[Property.Name(() => WorkingDirectory)]);
+
+            string error = sb.ToString().Trim();
+            if (error == string.Empty)
+            {
+                error = null;
+            }
+
+            Error = error;
         }
     }
 }

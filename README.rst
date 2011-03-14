@@ -1,6 +1,5 @@
-Air Cannon is a simple program launcher that enables easy 
-launching of programs with specific environment variable
-configurations.
+Air Cannon is a simple program launcher that allows programs
+to be launched with program-specific environment variables.
 
 Requirements
 ============

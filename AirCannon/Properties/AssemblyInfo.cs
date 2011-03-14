@@ -6,7 +6,7 @@ using System.Windows;
 [assembly: AssemblyDescription("A configurable program launcher")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Harvest of Gnar")]
-[assembly: AssemblyCopyright("Copyright © Harvest of Gnar 2011")]
+[assembly: AssemblyCopyright("Copyright © Garrett Pauls 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]

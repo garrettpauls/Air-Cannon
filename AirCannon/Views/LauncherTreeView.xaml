@@ -32,14 +32,17 @@
 				</TextBlock>
 			</HierarchicalDataTemplate>
 			<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
-				<TextBlock Text="{Binding Name}"
-				           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
-					<TextBlock.ContextMenu>
-						<ContextMenu>
-							<MenuItem Header="_Launch" Command="{Binding Path=LaunchCommand}" />
-						</ContextMenu>
-					</TextBlock.ContextMenu>
-				</TextBlock>
+				<StackPanel Orientation="Horizontal">
+                    <ContentPresenter Width="16" Height="16" Content="{Binding Path=Icon}" />
+                    <TextBlock Text="{Binding Name}"
+					           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
+						<TextBlock.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="_Launch" Command="{Binding Path=LaunchCommand}" />
+							</ContextMenu>
+						</TextBlock.ContextMenu>
+					</TextBlock>
+				</StackPanel>
 			</DataTemplate>
 		</TreeView.Resources>
 		<TreeView.ContextMenu>

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using System.Windows;
 using AirCannon.Framework.Services;
 using AirCannon.Properties;
@@ -11,7 +12,27 @@ namespace AirCannon
     /// </summary>
     public partial class App : Application
     {
+        private static string mCopyright;
         private static string mVersion;
+        private static readonly Assembly ASSEMBLY = Assembly.GetEntryAssembly();
+
+        /// <summary>
+        ///   Gets the copyright message.
+        /// </summary>
+        public static string Copyright
+        {
+            get
+            {
+                if (mCopyright == null)
+                {
+                    var copyrightAttrib = (AssemblyCopyrightAttribute)
+                                          ASSEMBLY.GetCustomAttributes(typeof (AssemblyCopyrightAttribute), false)
+                                              .FirstOrDefault();
+                    mCopyright = copyrightAttrib != null ? copyrightAttrib.Copyright : string.Empty;
+                }
+                return mCopyright;
+            }
+        }
 
         /// <summary>
         ///   Gets the version of the application.
@@ -22,8 +43,7 @@ namespace AirCannon
             {
                 if (mVersion == null)
                 {
-                    Assembly assembly = Assembly.GetEntryAssembly();
-                    mVersion = assembly.GetName().Version.ToString();
+                    mVersion = ASSEMBLY.GetName().Version.ToString();
                 }
                 return mVersion;
             }

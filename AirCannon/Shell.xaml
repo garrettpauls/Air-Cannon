@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Views="clr-namespace:AirCannon.Views"
         xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
-        xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification"
+        xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification" xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework"
         Title="Air Cannon" SizeToContent="WidthAndHeight"
         Icon="/Resources/Icons/application_go.png">
 	<Window.DataContext>
@@ -18,7 +18,7 @@
 	<Grid>
 		<Views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 		<HC:TaskbarIcon IconSource="Resources/Icons/application_go.ico" 
-                        DoubleClickCommand="{Binding Path=ToggleMainWindowCommandToggleMainWindowCommand}">
+                        DoubleClickCommand="{Binding Path=ToggleMainWindowCommand}">
 			<HC:TaskbarIcon.ContextMenu>
 				<ContextMenu ItemsSource="{Binding Path=Root.Children}">
 					<ContextMenu.Resources>
@@ -30,11 +30,22 @@
                             <TextBlock Text="{Binding Path=Name}" />
 						</HierarchicalDataTemplate>
                     </ContextMenu.Resources>
-                    <ContextMenu.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
-                            <Setter Property="Command" Value="{Binding Path=LaunchCommand}" />
-                        </Style>
-                    </ContextMenu.ItemContainerStyle>
+                    <ContextMenu.ItemContainerStyleSelector>
+                        <WPF:TypedStyleSelector>
+                            <WPF:TypedStyleSelector.Styles>
+                                <WPF:TypeStylePair Type="{x:Type ViewModels:LauncherViewModel}">
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Command"
+                                                Value="{Binding Path=LaunchCommand}" />
+                                        <Setter Property="Icon" Value="{Binding Path=Icon}" />
+                                        <Setter Property="ToolTip" Value="{Binding Path=Error}" />
+                                        <Setter Property="ToolTipService.ShowOnDisabled"
+                                                Value="True" />
+                                    </Style>
+                                </WPF:TypeStylePair>
+                            </WPF:TypedStyleSelector.Styles>
+                        </WPF:TypedStyleSelector>
+                    </ContextMenu.ItemContainerStyleSelector>
                 </ContextMenu>
 			</HC:TaskbarIcon.ContextMenu>
 		</HC:TaskbarIcon>
