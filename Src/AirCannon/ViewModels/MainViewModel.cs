@@ -150,13 +150,16 @@ namespace AirCannon.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets a command to toggle the visibility of the main window.
+        /// </summary>
         public DelegateCommand ToggleMainWindowCommand
         {
             get
             {
                 if (mToggleMainWindowCommand == null)
                 {
-                    mToggleMainWindowCommand = new DelegateCommand(_ToggleMainWindow, _CanToggleMainWindow);
+                    mToggleMainWindowCommand = new DelegateCommand(App.Current.Shell.ToggleVisibility, _CanToggleMainWindow);
                 }
                 return mToggleMainWindowCommand;
             }

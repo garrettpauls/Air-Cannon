@@ -9,7 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirCannon.Framework.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8026D2FA-FF0C-4309-BF41-9B1A5B88D8DB}"
 	ProjectSection(SolutionItems) = preProject
-		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
 		..\LICENSE = ..\LICENSE
 		..\README.rst = ..\README.rst
 	EndProjectSection

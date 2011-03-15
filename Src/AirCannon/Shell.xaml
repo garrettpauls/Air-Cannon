@@ -3,9 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Views="clr-namespace:AirCannon.Views"
         xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
-        xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification" xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework"
+        xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification" 
+        xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework"
         Title="Air Cannon" SizeToContent="WidthAndHeight"
-        Icon="/Resources/Icons/application_go.png">
+        Icon="/Resources/Icons/application_go.png"
+        StateChanged="_HandleWindowStateChanged">
 	<Window.DataContext>
 		<ViewModels:MainViewModel x:Name="mMainViewModel" />
 	</Window.DataContext>

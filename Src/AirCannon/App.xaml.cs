@@ -35,6 +35,23 @@ namespace AirCannon
         }
 
         /// <summary>
+        ///   Gets the current <see cref = "App" />.
+        /// </summary>
+        public new static App Current
+        {
+            get { return (App) Application.Current; }
+        }
+
+        /// <summary>
+        ///   Gets or sets the shell window.
+        /// </summary>
+        public Shell Shell
+        {
+            get { return MainWindow as Shell; }
+            set { MainWindow = value; }
+        }
+
+        /// <summary>
         ///   Gets the version of the application.
         /// </summary>
         public static string Version
@@ -50,21 +67,33 @@ namespace AirCannon
         }
 
         /// <summary>
-        ///   Handles the Exit event of the application.
+        ///   Raises the <see cref = "E:System.Windows.Application.Exit" /> event.
         /// </summary>
-        /// <param name = "sender">The source of the event.</param>
-        /// <param name = "e">The <see cref = "System.Windows.ExitEventArgs" /> instance containing the event data.</param>
-        private void _HandleExit(object sender, ExitEventArgs e)
+        /// <param name = "e">An <see cref = "T:System.Windows.ExitEventArgs" /> that contains the event data.</param>
+        protected override void OnExit(ExitEventArgs e)
         {
             Settings.Default.Save();
+            base.OnExit(e);
         }
 
         /// <summary>
-        ///   Handles the Startup event of the application.
+        ///   Raises the <see cref = "E:System.Windows.Application.Startup" /> event.
         /// </summary>
-        /// <param name = "sender">The source of the event.</param>
-        /// <param name = "e">The <see cref = "System.Windows.StartupEventArgs" /> instance containing the event data.</param>
-        private void _HandleStartup(object sender, StartupEventArgs e)
+        /// <param name = "e">A <see cref = "T:System.Windows.StartupEventArgs" /> that contains the event data.</param>
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            _RegisterServices();
+            Shell = new Shell();
+            
+            base.OnStartup(e);
+
+            Shell.Show();
+        }
+
+        /// <summary>
+        ///   Registers all known services.
+        /// </summary>
+        private static void _RegisterServices()
         {
             Service<IUserInteraction>.Register(new UserInteractionService());
         }
