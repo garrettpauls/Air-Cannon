@@ -33,8 +33,9 @@
 			</HierarchicalDataTemplate>
 			<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
 				<StackPanel Orientation="Horizontal">
-                    <ContentPresenter Width="16" Height="16" Content="{Binding Path=Icon}" />
-                    <TextBlock Text="{Binding Name}"
+					<Image Source="/Resources/Icons/bullet_go.png"
+					       Width="16" Height="16" />
+					<TextBlock Text="{Binding Name}"
 					           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
 						<TextBlock.ContextMenu>
 							<ContextMenu>

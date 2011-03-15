@@ -304,7 +304,12 @@ namespace AirCannon.Framework.Models
 
             foreach (var envVar in AggregateEnvironmentVariables())
             {
-                startInfo.EnvironmentVariables.Add(envVar.Key, envVar.Value);
+                if (string.IsNullOrEmpty(envVar.Key) ||
+                    string.IsNullOrEmpty(envVar.Value))
+                {
+                    continue;
+                }
+                startInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
             }
 
             return Process.Start(startInfo);

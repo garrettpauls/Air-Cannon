@@ -80,7 +80,6 @@
     <Compile Include="Services\IUserInteraction.cs" />
     <Compile Include="Services\Service.cs" />
     <Compile Include="Utilities\Property.cs" />
-    <Compile Include="Utilities\Resource.cs" />
     <Compile Include="WPF\DelegateCommand.cs" />
     <Compile Include="WPF\NotifyPropertyChangedBase.cs" />
     <Compile Include="WPF\ReadOnlyWrappingCollection.cs" />

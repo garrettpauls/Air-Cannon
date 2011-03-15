@@ -27,30 +27,9 @@ namespace AirCannon.ViewModels
                     Property<LauncherViewModel>.Name(p => p.WorkingDirectory),
                 };
 
-        private static readonly Image LAUNCHER_ICON;
-        private static readonly Image DISABLED_LAUNCHER_ICON;
-        private Image mIcon;
         private bool mIsSelected;
         private DelegateCommand mLaunchCommand;
         private LaunchGroupViewModel mParent;
-
-        /// <summary>
-        ///   Initializes the <see cref = "LauncherViewModel" /> class.
-        /// </summary>
-        static LauncherViewModel()
-        {
-            LAUNCHER_ICON =
-                new Image
-                    {
-                        Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/bullet_go.png"))
-                    };
-            DISABLED_LAUNCHER_ICON =
-                new Image
-                    {
-                        Source =
-                            new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/bullet_go_disabled.png"))
-                    };
-        }
 
         /// <summary>
         ///   Initializes a new instance of the <see cref = "LauncherViewModel" /> class.
@@ -60,7 +39,6 @@ namespace AirCannon.ViewModels
         {
             Model = launcher;
             Parent = new LaunchGroupViewModel(Model.Parent);
-            _UpdateIcon();
         }
 
         /// <summary>
@@ -86,14 +64,7 @@ namespace AirCannon.ViewModels
         public string File
         {
             get { return Model.File; }
-            set
-            {
-                if (Model.File != value)
-                {
-                    Model.File = value;
-                    _UpdateIcon();
-                }
-            }
+            set { Model.File = value; }
         }
 
         /// <summary>
@@ -102,15 +73,6 @@ namespace AirCannon.ViewModels
         public bool HasChanges
         {
             get { return Model.HasChanges; }
-        }
-
-        /// <summary>
-        ///   Gets the icon representing this launcher.
-        /// </summary>
-        public Image Icon
-        {
-            get { return mIcon; }
-            private set { SetPropertyValue(ref mIcon, value, () => Icon); }
         }
 
         /// <summary>
@@ -257,21 +219,6 @@ namespace AirCannon.ViewModels
         private void _Launch()
         {
             Model.Launch();
-        }
-
-        /// <summary>
-        ///   Updates the icon based on the file.
-        /// </summary>
-        private void _UpdateIcon()
-        {
-            if (IOFile.Exists(File))
-            {
-                Icon = LAUNCHER_ICON;
-            }
-            else
-            {
-                Icon = DISABLED_LAUNCHER_ICON;
-            }
         }
     }
 }

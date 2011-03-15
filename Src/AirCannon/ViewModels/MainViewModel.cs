@@ -187,6 +187,7 @@ namespace AirCannon.ViewModels
             if (_PromptForContinueIfRootIsChanged())
             {
                 Root = new LaunchGroupViewModel(new LaunchGroup());
+                Settings.Default.CurrentFile = null;
             }
         }
 
