@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Gallio.Framework.Assertions;
-using MbUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Utilities
 {
@@ -14,7 +14,7 @@ namespace AirCannon.Framework.Tests.Utilities
         ///   Verifies that <see cref = "Assert2.ContainsKeyAndValue{TKey,TValue}" /> throws the 
         ///   correct exception when the expected key is missing.
         /// </summary>
-        [Test, ExpectedException(typeof (AssertionFailureException))]
+        [Test, ExpectedException(typeof (AssertionException))]
         public void ContainsKeyAndValueKeyMissingTest()
         {
             var dictionary = new Dictionary<string, string> {{"A", "B"}};
@@ -38,7 +38,7 @@ namespace AirCannon.Framework.Tests.Utilities
         ///   Verifies that <see cref = "Assert2.ContainsKeyAndValue{TKey,TValue}" /> throws the
         ///   correct exception when the expected value is wrong.
         /// </summary>
-        [Test, ExpectedException(typeof (AssertionFailureException))]
+        [Test, ExpectedException(typeof (AssertionException))]
         public void ContainsKeyAndValueValueWrongTest()
         {
             var dictionary = new Dictionary<string, string> {{"A", "A"}};

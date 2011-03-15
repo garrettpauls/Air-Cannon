@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using AirCannon.Framework.Models;
-using AirCannon.Framework.Tests.Utilities;
 using AirCannon.Framework.Utilities;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Models
 {
@@ -14,10 +12,39 @@ namespace AirCannon.Framework.Tests.Models
     [TestFixture]
     public class EnvironmentVariableDictionaryTests
     {
+        #region Setup/Teardown
+
+        /// <summary>
+        ///   Sets up each test with a new dictionary and clear list of events.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            mEnvVars = new EnvironmentVariableCollection();
+            mCollectionChangedEvents.Clear();
+            mEnvVars.CollectionChanged += _HandleCollectionChanged;
+        }
+
+        #endregion
+
         private readonly List<NotifyCollectionChangedEventArgs> mCollectionChangedEvents =
             new List<NotifyCollectionChangedEventArgs>();
 
         private EnvironmentVariableCollection mEnvVars = new EnvironmentVariableCollection();
+
+        private void _AssertContainsKeyAndValue(EnvironmentVariableCollection envVars, string key1, string value)
+        {
+        }
+
+        /// <summary>
+        ///   Handles the CollectionChanged event of the dictionary.
+        /// </summary>
+        /// <param name = "sender">The source of the event.</param>
+        /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
+        private void _HandleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            mCollectionChangedEvents.Add(e);
+        }
 
         /// <summary>
         ///   Verifies the <see cref = "EnvironmentVariableCollection.CollectionChanged" /> event
@@ -28,10 +55,11 @@ namespace AirCannon.Framework.Tests.Models
         {
             var kvp = new EnvironmentVariable("a", "b");
             mEnvVars.Add(kvp);
-            Assert.Count(1, mCollectionChangedEvents, "CollectionChanged should have been fired once");
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1),
+                        "CollectionChanged should have been fired once");
             var e = mCollectionChangedEvents[0];
             Assert.AreEqual(NotifyCollectionChangedAction.Add, e.Action);
-            Assert.Count(1, e.NewItems, "One item should have been added");
+            Assert.That(e.NewItems.Count, Is.EqualTo(1), "One item should have been added");
             Assert.AreEqual(kvp, e.NewItems[0]);
             Assert.IsNull(e.OldItems, "There should be no old items");
 
@@ -39,10 +67,11 @@ namespace AirCannon.Framework.Tests.Models
             mCollectionChangedEvents.Clear();
 
             mEnvVars[kvp.Key] = kvp.Value;
-            Assert.Count(1, mCollectionChangedEvents, "CollectionChanged should have been fired once");
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1),
+                        "CollectionChanged should have been fired once");
             e = mCollectionChangedEvents[0];
             Assert.AreEqual(NotifyCollectionChangedAction.Add, e.Action);
-            Assert.Count(1, e.NewItems, "One item should have been added");
+            Assert.That(e.NewItems.Count, Is.EqualTo(1), "One item should have been added");
             Assert.AreEqual(kvp, e.NewItems[0]);
             Assert.IsNull(e.OldItems, "There should be no old items");
         }
@@ -59,38 +88,13 @@ namespace AirCannon.Framework.Tests.Models
             mCollectionChangedEvents.Clear();
 
             mEnvVars.Remove(kvp);
-            Assert.Count(1, mCollectionChangedEvents, "CollectionChanged should have been fired once");
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1),
+                        "CollectionChanged should have been fired once");
             var e = mCollectionChangedEvents[0];
 
             Assert.AreEqual(NotifyCollectionChangedAction.Remove, e.Action);
-            Assert.Count(1, e.OldItems, "One old item should have been removed");
+            Assert.That(e.OldItems.Count, Is.EqualTo(1), "One old item should have been removed");
             Assert.AreEqual(kvp, e.OldItems[0]);
-        }
-
-        /// <summary>
-        ///   Verifies the <see cref = "EnvironmentVariableCollection.ItemChanged" /> event
-        ///   is called when items are replaced.
-        /// </summary>
-        [Test]
-        public void ItemChangedTest()
-        {
-            const string KEY = "a";
-            const string VALUE1 = "a";
-            const string VALUE2 = "b";
-
-            var itemChangedEvents = new List<ItemChangedEventArgs<EnvironmentVariable>>();
-            mEnvVars.ItemChanged += (sender, e) => itemChangedEvents.Add(e);
-
-            mEnvVars[KEY] = VALUE1;
-            mCollectionChangedEvents.Clear();
-
-            mEnvVars[KEY] = VALUE2;
-            Assert.Count(1, itemChangedEvents, "CollectionChanged should have been fired once");
-            var evt = itemChangedEvents[0];
-
-            Assert.AreEqual(KEY, evt.Item.Key);
-            Assert.AreEqual(VALUE2, evt.Item.Value);
-            Assert.AreEqual(Property<EnvironmentVariable>.Name(p => p.Value), evt.PropertyName);
         }
 
         /// <summary>
@@ -107,7 +111,8 @@ namespace AirCannon.Framework.Tests.Models
             mCollectionChangedEvents.Clear();
 
             mEnvVars.Clear();
-            Assert.Count(1, mCollectionChangedEvents, "CollectionChanged should have been fired once");
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1),
+                        "CollectionChanged should have been fired once");
             Assert.AreEqual(NotifyCollectionChangedAction.Reset, mCollectionChangedEvents[0].Action);
         }
 
@@ -141,14 +146,30 @@ namespace AirCannon.Framework.Tests.Models
         }
 
         /// <summary>
-        ///   Sets up each test with a new dictionary and clear list of events.
+        ///   Verifies the <see cref = "EnvironmentVariableCollection.ItemChanged" /> event
+        ///   is called when items are replaced.
         /// </summary>
-        [SetUp]
-        public void SetUp()
+        [Test]
+        public void ItemChangedTest()
         {
-            mEnvVars = new EnvironmentVariableCollection();
+            const string KEY = "a";
+            const string VALUE1 = "a";
+            const string VALUE2 = "b";
+
+            var itemChangedEvents = new List<ItemChangedEventArgs<EnvironmentVariable>>();
+            mEnvVars.ItemChanged += (sender, e) => itemChangedEvents.Add(e);
+
+            mEnvVars[KEY] = VALUE1;
             mCollectionChangedEvents.Clear();
-            mEnvVars.CollectionChanged += _HandleCollectionChanged;
+
+            mEnvVars[KEY] = VALUE2;
+            Assert.That(itemChangedEvents.Count, Is.EqualTo(1),
+                        "CollectionChanged should have been fired once");
+            var evt = itemChangedEvents[0];
+
+            Assert.AreEqual(KEY, evt.Item.Key);
+            Assert.AreEqual(VALUE2, evt.Item.Value);
+            Assert.AreEqual(Property<EnvironmentVariable>.Name(p => p.Value), evt.PropertyName);
         }
 
         /// <summary>
@@ -167,35 +188,22 @@ namespace AirCannon.Framework.Tests.Models
             mEnvVars[KEY1] = VALUE1;
             mEnvVars[KEY2] = VALUE2;
 
-            Assert.Contains(mEnvVars, new EnvironmentVariable(KEY1, VALUE1));
-            Assert.Contains(mEnvVars, new EnvironmentVariable(KEY2, VALUE2));
+
+            Assert.That(mEnvVars, Contains.Item(new EnvironmentVariable(KEY1, VALUE1)));
+            Assert.That(mEnvVars, Contains.Item(new EnvironmentVariable(KEY2, VALUE2)));
             Assert.IsFalse(mEnvVars.ContainsKey(KEY3));
 
             var result = mEnvVars.UpdateWith(new[]
-                                                    {
-                                                        new EnvironmentVariable(KEY2, KEY2),
-                                                        new EnvironmentVariable(KEY3, VALUE3)
-                                                    });
+                                                 {
+                                                     new EnvironmentVariable(KEY2, KEY2),
+                                                     new EnvironmentVariable(KEY3, VALUE3)
+                                                 });
 
-            Assert.Contains(mEnvVars, new EnvironmentVariable(KEY1, VALUE1));
-            Assert.Contains(mEnvVars, new EnvironmentVariable(KEY2, KEY2));
-            Assert.Contains(mEnvVars, new EnvironmentVariable(KEY3, VALUE3));
+            Assert.That(mEnvVars, Contains.Item(new EnvironmentVariable(KEY1, VALUE1)));
+            Assert.That(mEnvVars, Contains.Item(new EnvironmentVariable(KEY2, KEY2)));
+            Assert.That(mEnvVars, Contains.Item(new EnvironmentVariable(KEY3, VALUE3)));
 
             Assert.AreSame(mEnvVars, result, "UpdateWith should return the updated dictionary");
-        }
-
-        private void _AssertContainsKeyAndValue(EnvironmentVariableCollection envVars, string key1, string value)
-        {
-        }
-
-        /// <summary>
-        ///   Handles the CollectionChanged event of the dictionary.
-        /// </summary>
-        /// <param name = "sender">The source of the event.</param>
-        /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
-        private void _HandleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            mCollectionChangedEvents.Add(e);
         }
     }
 }

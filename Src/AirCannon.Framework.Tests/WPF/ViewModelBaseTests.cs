@@ -2,7 +2,7 @@
 using System.Linq;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.WPF
 {
@@ -39,6 +39,17 @@ namespace AirCannon.Framework.Tests.WPF
     [TestFixture]
     public class ViewModelBaseTests : ViewModelBase<ViewModelBaseTestsModel>
     {
+        #region Setup/Teardown
+
+        [SetUp]
+        public void SetUp()
+        {
+            Model = new ViewModelBaseTestsModel();
+            mChangedProperties.Clear();
+        }
+
+        #endregion
+
         private readonly List<string> mChangedProperties = new List<string>();
 
         /// <summary>
@@ -56,6 +67,15 @@ namespace AirCannon.Framework.Tests.WPF
         }
 
         /// <summary>
+        ///   Called when the model has a property change.
+        /// </summary>
+        protected override void OnBasePropertyChanged(string propertyName)
+        {
+            mChangedProperties.Add(propertyName);
+            base.OnBasePropertyChanged(propertyName);
+        }
+
+        /// <summary>
         ///   Verifies <see cref = "OnBasePropertyChanged" /> is called correctly when a Model
         ///   property gets changed.
         /// </summary>
@@ -63,7 +83,8 @@ namespace AirCannon.Framework.Tests.WPF
         public void OnBasePropertyChangedTest()
         {
             Model.TestProperty = "asdf";
-            Assert.Count(1, mChangedProperties, "Exactly one property should have been changed");
+            Assert.That(mChangedProperties.Count, Is.EqualTo(1),
+                        "Exactly one property should have been changed");
             Assert.AreEqual(Property<ViewModelBaseTestsModel>.Name(p => p.TestProperty), mChangedProperties[0],
                             "The wrong property was called by OnBasePropertyChanged");
         }
@@ -82,36 +103,18 @@ namespace AirCannon.Framework.Tests.WPF
             var propertyChangedEvents = new List<string>();
             PropertyChanged += (sender, e) => propertyChangedEvents.Add(e.PropertyName);
 
-            Assert.Count(1, PassthroughPropertyNames, "PassthroughPropertyNames should only include TestProperty");
+            Assert.That(PassthroughPropertyNames.Count(), Is.EqualTo(1),
+                        "PassthroughPropertyNames should only include TestProperty");
             Assert.AreEqual(passthroughedProperty, PassthroughPropertyNames.First(),
                             "PassthroughPropertyNames should only include TestProperty");
 
             Model.TestProperty = "asdf";
             Model.UnusedProperty = "lll";
 
-            Assert.Count(1, propertyChangedEvents, "Only TestProperty should have been passed through");
+            Assert.That(propertyChangedEvents.Count, Is.EqualTo(1),
+                        "Only TestProperty should have been passed through");
             Assert.AreEqual(passthroughedProperty, propertyChangedEvents[0],
                             "Only TestProperty should have been passed through as a property changed event");
         }
-
-        [SetUp]
-        public void SetUp()
-        {
-            Model = new ViewModelBaseTestsModel();
-            mChangedProperties.Clear();
-        }
-
-        #region Overrides of ViewModelBase<ViewModelBaseTests>
-
-        /// <summary>
-        ///   Called when the model has a property change.
-        /// </summary>
-        protected override void OnBasePropertyChanged(string propertyName)
-        {
-            mChangedProperties.Add(propertyName);
-            base.OnBasePropertyChanged(propertyName);
-        }
-
-        #endregion
     }
 }

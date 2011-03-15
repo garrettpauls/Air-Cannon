@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 using AirCannon.Framework.WPF;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.WPF
 {
@@ -11,11 +11,42 @@ namespace AirCannon.Framework.Tests.WPF
     [TestFixture]
     public class DelegateCommandTests
     {
-        protected bool mCanExecuteCalled = false;
+        #region Setup/Teardown
 
+        /// <summary>
+        ///   Resets the command.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            mCommand = CreateCommand();
+            mCanExecuteCalled = false;
+            mExecuteCalled = false;
+            mCanExecuteResult = true;
+        }
+
+        #endregion
+
+        protected bool mCanExecuteCalled = false;
         protected bool mCanExecuteResult = true;
         protected ICommand mCommand;
         protected bool mExecuteCalled = false;
+
+        protected bool CanExecute()
+        {
+            mCanExecuteCalled = true;
+            return mCanExecuteResult;
+        }
+
+        protected virtual ICommand CreateCommand()
+        {
+            return new DelegateCommand(Execute, CanExecute);
+        }
+
+        protected void Execute()
+        {
+            mExecuteCalled = true;
+        }
 
         /// <summary>
         ///   Verifies that CanExecute is called correctly.
@@ -47,34 +78,6 @@ namespace AirCannon.Framework.Tests.WPF
             mCommand.Execute(null);
             Assert.IsFalse(mExecuteCalled);
         }
-
-        /// <summary>
-        ///   Resets the command.
-        /// </summary>
-        [SetUp]
-        public void SetUp()
-        {
-            mCommand = CreateCommand();
-            mCanExecuteCalled = false;
-            mExecuteCalled = false;
-            mCanExecuteResult = true;
-        }
-
-        protected bool CanExecute()
-        {
-            mCanExecuteCalled = true;
-            return mCanExecuteResult;
-        }
-
-        protected virtual ICommand CreateCommand()
-        {
-            return new DelegateCommand(Execute, CanExecute);
-        }
-
-        protected void Execute()
-        {
-            mExecuteCalled = true;
-        }
     }
 
     [TestFixture]
@@ -82,6 +85,23 @@ namespace AirCannon.Framework.Tests.WPF
     {
         private int? mCanExecuteCalledWith;
         private int? mExecuteCalledWith;
+
+        protected override ICommand CreateCommand()
+        {
+            return new DelegateCommand<int?>(_Execute, _CanExecute);
+        }
+
+        private bool _CanExecute(int? parameter)
+        {
+            mCanExecuteCalledWith = parameter;
+            return CanExecute();
+        }
+
+        private void _Execute(int? parameter)
+        {
+            mExecuteCalledWith = parameter;
+            Execute();
+        }
 
         /// <summary>
         ///   Verifies that CanExecute gets called with the right parameter.
@@ -143,23 +163,6 @@ namespace AirCannon.Framework.Tests.WPF
         public void ExecuteWrongParameterTypeTest()
         {
             mCommand.Execute("Blah");
-        }
-
-        protected override ICommand CreateCommand()
-        {
-            return new DelegateCommand<int?>(_Execute, _CanExecute);
-        }
-
-        private bool _CanExecute(int? parameter)
-        {
-            mCanExecuteCalledWith = parameter;
-            return CanExecute();
-        }
-
-        private void _Execute(int? parameter)
-        {
-            mExecuteCalledWith = parameter;
-            Execute();
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using AirCannon.Framework.WPF;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.WPF
 {
@@ -50,7 +51,7 @@ namespace AirCannon.Framework.Tests.WPF
         /// <summary>
         ///   Verifies that the style associated with the given object's type is returned.
         /// </summary>
-        [Test]
+        [Test, STAThread]
         public void StyleSelectionTest()
         {
             Assert.AreSame(mButtonStyle, mSelector.SelectStyle(new Button(), null));

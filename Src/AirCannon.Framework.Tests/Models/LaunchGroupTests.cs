@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using AirCannon.Framework.Models;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Models
 {

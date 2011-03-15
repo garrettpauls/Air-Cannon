@@ -1,5 +1,5 @@
 ﻿using AirCannon.Framework.Utilities;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Utilities
 {

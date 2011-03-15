@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using AirCannon.Framework.WPF;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.WPF
 {
@@ -11,6 +11,23 @@ namespace AirCannon.Framework.Tests.WPF
     [TestFixture]
     public class NotifyPropertyChangedBaseTests : NotifyPropertyChangedBase
     {
+        #region Setup/Teardown
+
+        /// <summary>
+        ///   Resets all the class fields before each test is run.
+        /// </summary>
+        [SetUp]
+        public void TestSetup()
+        {
+            mChangedProperties.Clear();
+            Assert.That(mChangedProperties, Is.Empty, "Failed to reset changed properties list");
+
+            mTestProperty = string.Empty;
+            mOtherTestProperty = 0;
+        }
+
+        #endregion
+
         private const string TEST_PROPERTY_NAME = "TestProperty";
         private readonly List<string> mChangedProperties = new List<string>();
 
@@ -39,6 +56,14 @@ namespace AirCannon.Framework.Tests.WPF
         }
 
         /// <summary>
+        ///   Adds the changed property to the list of changed properties.
+        /// </summary>
+        private void _HandlePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            mChangedProperties.Add(e.PropertyName);
+        }
+
+        /// <summary>
         ///   Verifies that the <see cref = "NotifyPropertyChangedBase.OnPropertyChanged{TProp}" /> 
         ///   method works correctly.
         /// </summary>
@@ -48,7 +73,8 @@ namespace AirCannon.Framework.Tests.WPF
             OnPropertyChanged(() => TestProperty);
             OnPropertyChanged(() => OtherTestProperty);
 
-            Assert.Count(2, mChangedProperties, "Two properties should have been changed");
+            Assert.That(mChangedProperties.Count, Is.EqualTo(2),
+                        "Two properties should have been changed");
             Assert.AreEqual(TEST_PROPERTY_NAME, mChangedProperties[0], "{0} should have been raised first",
                             TEST_PROPERTY_NAME);
             Assert.AreEqual("OtherTestProperty", mChangedProperties[1],
@@ -66,7 +92,8 @@ namespace AirCannon.Framework.Tests.WPF
 
             bool result = SetPropertyValue(ref mTestProperty, NEW_VALUE, () => TestProperty);
             Assert.IsTrue(result, "{0} should have been changed", TEST_PROPERTY_NAME);
-            Assert.Count(1, mChangedProperties, "One property should have been changed");
+            Assert.That(mChangedProperties.Count, Is.EqualTo(1),
+                        "One property should have been changed");
             Assert.AreEqual(TEST_PROPERTY_NAME, mChangedProperties[0],
                             "{0} should have been changed", TEST_PROPERTY_NAME);
 
@@ -74,28 +101,8 @@ namespace AirCannon.Framework.Tests.WPF
 
             result = SetPropertyValue(ref mTestProperty, NEW_VALUE, () => TestProperty);
             Assert.IsFalse(result, "{0} should not have changed", TEST_PROPERTY_NAME);
-            Assert.Count(0, mChangedProperties, "No properties should have been changed");
-        }
-
-        /// <summary>
-        ///   Resets all the class fields before each test is run.
-        /// </summary>
-        [SetUp]
-        public void TestSetup()
-        {
-            mChangedProperties.Clear();
-            Assert.Count(0, mChangedProperties, "Failed to reset changed properties list");
-
-            mTestProperty = string.Empty;
-            mOtherTestProperty = 0;
-        }
-
-        /// <summary>
-        ///   Adds the changed property to the list of changed properties.
-        /// </summary>
-        private void _HandlePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            mChangedProperties.Add(e.PropertyName);
+            Assert.That(mChangedProperties, Is.Empty,
+                        "No properties should have been changed");
         }
     }
 }

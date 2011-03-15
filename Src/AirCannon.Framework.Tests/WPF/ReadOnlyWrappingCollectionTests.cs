@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using AirCannon.Framework.WPF;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.WPF
 {
@@ -25,16 +25,31 @@ namespace AirCannon.Framework.Tests.WPF
 
         public bool Equals(TestBase other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
             return other.Number == Number;
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (TestBase)) return false;
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (TestBase))
+            {
+                return false;
+            }
             return Equals((TestBase) obj);
         }
 
@@ -67,16 +82,31 @@ namespace AirCannon.Framework.Tests.WPF
 
         public bool Equals(TestWrapper other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
             return Equals(other.mBase, mBase);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (TestWrapper)) return false;
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (TestWrapper))
+            {
+                return false;
+            }
             return Equals((TestWrapper) obj);
         }
 
@@ -92,140 +122,7 @@ namespace AirCannon.Framework.Tests.WPF
     [TestFixture]
     public class ReadOnlyWrappingCollectionTests
     {
-        private ObservableCollection<TestBase> mBackingCollection;
-        private List<NotifyCollectionChangedEventArgs> mCollectionChangedEvents;
-        private ReadOnlyWrappingCollection<TestWrapper, TestBase> mWrappingCollection;
-
-        /// <summary>
-        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles adding to the backing collection correctly.
-        /// </summary>
-        [Test]
-        public void AddTest()
-        {
-            var item1 = new TestBase(1);
-            var item2 = new TestBase(2);
-
-            mBackingCollection.Add(item1);
-            mBackingCollection.Add(item2);
-
-            _AssertBackingAndWrappedAreSynced();
-
-            Assert.Count(2, mCollectionChangedEvents);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, mCollectionChangedEvents[0].Action);
-            Assert.Count(1, mCollectionChangedEvents[0].NewItems);
-            Assert.AreEqual(_Wrap(item1), mCollectionChangedEvents[0].NewItems[0]);
-            Assert.IsNull(mCollectionChangedEvents[0].OldItems);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, mCollectionChangedEvents[1].Action);
-            Assert.Count(1, mCollectionChangedEvents[1].NewItems);
-            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[1].NewItems[0]);
-            Assert.IsNull(mCollectionChangedEvents[1].OldItems);
-        }
-
-        /// <summary>
-        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles moving items in the backing collection correctly.
-        /// </summary>
-        [Test]
-        public void MoveTest()
-        {
-            var item1 = new TestBase(1);
-            var item2 = new TestBase(2);
-            var item3 = new TestBase(3);
-
-            _Setup(item1, item2, item3);
-
-            mBackingCollection.Move(1, 2);
-
-            Assert.AreElementsEqual(new[] {item1, item3, item2}, mBackingCollection);
-
-            _AssertBackingAndWrappedAreSynced();
-
-            Assert.Count(1, mCollectionChangedEvents);
-            Assert.AreEqual(NotifyCollectionChangedAction.Move, mCollectionChangedEvents[0].Action);
-            Assert.Count(1, mCollectionChangedEvents[0].OldItems);
-            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].OldItems[0]);
-            Assert.Count(1, mCollectionChangedEvents[0].NewItems);
-            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].NewItems[0]);
-            Assert.AreEqual(1, mCollectionChangedEvents[0].OldStartingIndex);
-            Assert.AreEqual(2, mCollectionChangedEvents[0].NewStartingIndex);
-        }
-
-        /// <summary>
-        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles removal of items from the backing collection correctly.
-        /// </summary>
-        [Test]
-        public void RemoveTest()
-        {
-            var item1 = new TestBase(1);
-            var item2 = new TestBase(2);
-            var item3 = new TestBase(3);
-
-            _Setup(item1, item2, item3);
-
-            mBackingCollection.Remove(item2);
-
-            Assert.Count(2, mBackingCollection);
-            Assert.AreSame(item1, mBackingCollection[0]);
-            Assert.AreSame(item3, mBackingCollection[1]);
-
-            _AssertBackingAndWrappedAreSynced();
-
-            Assert.Count(1, mCollectionChangedEvents);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, mCollectionChangedEvents[0].Action);
-            Assert.Count(1, mCollectionChangedEvents[0].OldItems);
-            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].OldItems[0]);
-            Assert.IsNull(mCollectionChangedEvents[0].NewItems);
-        }
-
-        /// <summary>
-        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles replacing items in the backing collection correctly.
-        /// </summary>
-        [Test]
-        public void ReplaceTest()
-        {
-            var item1 = new TestBase(1);
-            var item2 = new TestBase(2);
-            var item3 = new TestBase(3);
-
-            _Setup(item1, item2, item3);
-
-            mBackingCollection[0] = item2;
-
-            Assert.AreElementsEqual(new[] {item2, item2, item3}, mBackingCollection);
-
-            _AssertBackingAndWrappedAreSynced();
-
-            Assert.Count(1, mCollectionChangedEvents);
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, mCollectionChangedEvents[0].Action);
-            Assert.Count(1, mCollectionChangedEvents[0].OldItems);
-            Assert.AreEqual(_Wrap(item1), mCollectionChangedEvents[0].OldItems[0]);
-            Assert.Count(1, mCollectionChangedEvents[0].NewItems);
-            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].NewItems[0]);
-        }
-
-        /// <summary>
-        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles clearing the backing collection correctly.
-        /// </summary>
-        [Test]
-        public void ResetTest()
-        {
-            var item1 = new TestBase(1);
-            var item2 = new TestBase(2);
-            var item3 = new TestBase(3);
-
-            _Setup(item1, item2, item3);
-
-            mBackingCollection.Clear();
-
-            Assert.Count(0, mBackingCollection);
-
-            _AssertBackingAndWrappedAreSynced();
-
-            Assert.Count(1, mCollectionChangedEvents);
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, mCollectionChangedEvents[0].Action);
-            Assert.IsNull(mCollectionChangedEvents[0].OldItems);
-            Assert.IsNull(mCollectionChangedEvents[0].NewItems);
-        }
+        #region Setup/Teardown
 
         /// <summary>
         ///   Setup before each test is run.
@@ -236,13 +133,19 @@ namespace AirCannon.Framework.Tests.WPF
             _Setup();
         }
 
+        #endregion
+
+        private ObservableCollection<TestBase> mBackingCollection;
+        private List<NotifyCollectionChangedEventArgs> mCollectionChangedEvents;
+        private ReadOnlyWrappingCollection<TestWrapper, TestBase> mWrappingCollection;
+
         /// <summary>
         ///   Verifies the wrapping collection is correctly synced with the backing collection.
         /// </summary>
         private void _AssertBackingAndWrappedAreSynced()
         {
             Assert.AreEqual(mBackingCollection.Count, mWrappingCollection.Count);
-            Assert.AreElementsEqual(mBackingCollection, mWrappingCollection.Select(_Unwrap));
+            Assert.That(mWrappingCollection.Select(_Unwrap), Is.EqualTo(mBackingCollection));
         }
 
 
@@ -288,6 +191,138 @@ namespace AirCannon.Framework.Tests.WPF
         private static TestWrapper _Wrap(TestBase arg)
         {
             return new TestWrapper(arg);
+        }
+
+        /// <summary>
+        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles adding to the backing collection correctly.
+        /// </summary>
+        [Test]
+        public void AddTest()
+        {
+            var item1 = new TestBase(1);
+            var item2 = new TestBase(2);
+
+            mBackingCollection.Add(item1);
+            mBackingCollection.Add(item2);
+
+            _AssertBackingAndWrappedAreSynced();
+
+
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(2));
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, mCollectionChangedEvents[0].Action);
+            Assert.That(mCollectionChangedEvents[0].NewItems.Count, Is.EqualTo(1));
+            Assert.AreEqual(_Wrap(item1), mCollectionChangedEvents[0].NewItems[0]);
+            Assert.IsNull(mCollectionChangedEvents[0].OldItems);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, mCollectionChangedEvents[1].Action);
+            Assert.That(mCollectionChangedEvents[1].NewItems.Count, Is.EqualTo(1));
+            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[1].NewItems[0]);
+            Assert.IsNull(mCollectionChangedEvents[1].OldItems);
+        }
+
+        /// <summary>
+        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles moving items in the backing collection correctly.
+        /// </summary>
+        [Test]
+        public void MoveTest()
+        {
+            var item1 = new TestBase(1);
+            var item2 = new TestBase(2);
+            var item3 = new TestBase(3);
+
+            _Setup(item1, item2, item3);
+
+            mBackingCollection.Move(1, 2);
+
+            Assert.That(mBackingCollection, Is.EqualTo(new[] {item1, item3, item2}));
+
+            _AssertBackingAndWrappedAreSynced();
+
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1));
+            Assert.AreEqual(NotifyCollectionChangedAction.Move, mCollectionChangedEvents[0].Action);
+            Assert.That(mCollectionChangedEvents[0].OldItems.Count, Is.EqualTo(1));
+            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].OldItems[0]);
+            Assert.That(mCollectionChangedEvents[0].NewItems.Count, Is.EqualTo(1));
+            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].NewItems[0]);
+            Assert.AreEqual(1, mCollectionChangedEvents[0].OldStartingIndex);
+            Assert.AreEqual(2, mCollectionChangedEvents[0].NewStartingIndex);
+        }
+
+        /// <summary>
+        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles removal of items from the backing collection correctly.
+        /// </summary>
+        [Test]
+        public void RemoveTest()
+        {
+            var item1 = new TestBase(1);
+            var item2 = new TestBase(2);
+            var item3 = new TestBase(3);
+
+            _Setup(item1, item2, item3);
+
+            mBackingCollection.Remove(item2);
+
+            Assert.That(mBackingCollection.Count, Is.EqualTo(2));
+            Assert.AreSame(item1, mBackingCollection[0]);
+            Assert.AreSame(item3, mBackingCollection[1]);
+
+            _AssertBackingAndWrappedAreSynced();
+
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1));
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, mCollectionChangedEvents[0].Action);
+            Assert.That(mCollectionChangedEvents[0].OldItems.Count, Is.EqualTo(1));
+            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].OldItems[0]);
+            Assert.IsNull(mCollectionChangedEvents[0].NewItems);
+        }
+
+        /// <summary>
+        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles replacing items in the backing collection correctly.
+        /// </summary>
+        [Test]
+        public void ReplaceTest()
+        {
+            var item1 = new TestBase(1);
+            var item2 = new TestBase(2);
+            var item3 = new TestBase(3);
+
+            _Setup(item1, item2, item3);
+
+            mBackingCollection[0] = item2;
+
+            Assert.That(mBackingCollection, Is.EqualTo(new[] {item2, item2, item3}));
+
+            _AssertBackingAndWrappedAreSynced();
+
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1));
+            Assert.AreEqual(NotifyCollectionChangedAction.Replace, mCollectionChangedEvents[0].Action);
+            Assert.That(mCollectionChangedEvents[0].OldItems.Count, Is.EqualTo(1));
+            Assert.AreEqual(_Wrap(item1), mCollectionChangedEvents[0].OldItems[0]);
+            Assert.That(mCollectionChangedEvents[0].NewItems.Count, Is.EqualTo(1));
+            Assert.AreEqual(_Wrap(item2), mCollectionChangedEvents[0].NewItems[0]);
+        }
+
+        /// <summary>
+        ///   Verifies <see cref = "ReadOnlyWrappingCollectionTests" /> handles clearing the backing collection correctly.
+        /// </summary>
+        [Test]
+        public void ResetTest()
+        {
+            var item1 = new TestBase(1);
+            var item2 = new TestBase(2);
+            var item3 = new TestBase(3);
+
+            _Setup(item1, item2, item3);
+
+            mBackingCollection.Clear();
+
+            Assert.That(mBackingCollection, Is.Empty);
+
+            _AssertBackingAndWrappedAreSynced();
+
+            Assert.That(mCollectionChangedEvents.Count, Is.EqualTo(1));
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, mCollectionChangedEvents[0].Action);
+            Assert.IsNull(mCollectionChangedEvents[0].OldItems);
+            Assert.IsNull(mCollectionChangedEvents[0].NewItems);
         }
     }
 }

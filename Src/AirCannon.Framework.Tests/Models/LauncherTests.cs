@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Models
 {
@@ -15,7 +15,47 @@ namespace AirCannon.Framework.Tests.Models
     [TestFixture]
     public class LauncherTests
     {
+        #region Setup/Teardown
+
+        /// <summary>
+        ///   Creates a temporary folder for tests.
+        /// </summary>
+        [SetUp]
+        public void TestSetup()
+        {
+            mTempDir = Path.GetTempFileName();
+            File.Delete(mTempDir);
+            Directory.CreateDirectory(mTempDir);
+
+            Assert.IsTrue(Directory.Exists(mTempDir),
+                          "Temporary directory '{0}' could not be created", mTempDir);
+        }
+
+        /// <summary>
+        ///   Deletes the temporary folder.
+        /// </summary>
+        [TearDown]
+        public void TestTeardown()
+        {
+            //Give some time for files to unlock
+            Thread.Sleep(500);
+
+            Directory.Delete(mTempDir, true);
+
+            Assert.IsFalse(Directory.Exists(mTempDir),
+                           "Test cleanup - Temporary directory '{0}' could not be deleted", mTempDir);
+
+            mTempDir = string.Empty;
+        }
+
+        #endregion
+
         private string mTempDir;
+
+        private string _GetExistingFilePath()
+        {
+            return new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+        }
 
         /// <summary>
         ///   Verifies that <see cref = "Launcher.AggregateEnvironmentVariables" /> works correctly.
@@ -56,11 +96,11 @@ namespace AirCannon.Framework.Tests.Models
 
             var envVars = launcher.AggregateEnvironmentVariables();
 
-            Assert.Contains(envVars, new EnvironmentVariable("A", "A"));
-            Assert.Contains(envVars, new EnvironmentVariable("B", "B2"));
-            Assert.Contains(envVars, new EnvironmentVariable("C", "C"));
-            Assert.Contains(envVars, new EnvironmentVariable("D", "D2"));
-            Assert.Contains(envVars, new EnvironmentVariable("E", "E"));
+            Assert.That(envVars, Contains.Item(new EnvironmentVariable("A", "A")));
+            Assert.That(envVars, Contains.Item(new EnvironmentVariable("B", "B2")));
+            Assert.That(envVars, Contains.Item(new EnvironmentVariable("C", "C")));
+            Assert.That(envVars, Contains.Item(new EnvironmentVariable("D", "D2")));
+            Assert.That(envVars, Contains.Item(new EnvironmentVariable("E", "E")));
         }
 
         /// <summary>
@@ -196,7 +236,7 @@ namespace AirCannon.Framework.Tests.Models
         /// <summary>
         ///   Verifies the Launcher runs a simple script correctly.
         /// </summary>
-        [Test, Timeout(60)]
+        [Test, Timeout(60000)]
         public void LaunchTest()
         {
             const string SCRIPT_NAME = "test.bat";
@@ -220,7 +260,7 @@ namespace AirCannon.Framework.Tests.Models
         /// <summary>
         ///   Verifies the Launcher runs a script with the correct environment variables.
         /// </summary>
-        [Test, Timeout(60)]
+        [Test, Timeout(60000)]
         public void LaunchWithEnvironmentVariablesTest()
         {
             const string SCRIPT_NAME = "test.bat";
@@ -228,8 +268,7 @@ namespace AirCannon.Framework.Tests.Models
             string testFilePath = Path.Combine(mTempDir, "test.txt");
             string script = @"
 @echo %v1%>>""" + testFilePath + @"""
-@echo %v2%>>""" + testFilePath +
-                            @"""
+@echo %v2%>>""" + testFilePath + @"""
 @echo %v3%>>""" + testFilePath + @"""";
 
             var v1 = new EnvironmentVariable("v1", "{E16620DD-D150-4F2C-B4AE-DBC54E72373C}");
@@ -251,41 +290,11 @@ namespace AirCannon.Framework.Tests.Models
             Assert.IsTrue(File.Exists(testFilePath), "Process should have created the file '{0}'", testFilePath);
 
             string[] contents = File.ReadAllLines(testFilePath);
-            Assert.Count(3, contents, "There should have been three lines in the output file");
+            Assert.That(contents.Length, Is.EqualTo(3),
+                        "There should have been three lines in the output file");
             Assert.AreEqual(v1.Value, contents[0], "The first environment variable value was wrong");
             Assert.AreEqual(v2.Value, contents[1], "The second environment variable value was wrong");
             Assert.AreEqual(v3.Value, contents[2], "The third environment variable value was wrong");
-        }
-
-        /// <summary>
-        ///   Creates a temporary folder for tests.
-        /// </summary>
-        [SetUp]
-        public void TestSetup()
-        {
-            mTempDir = Path.GetTempFileName();
-            File.Delete(mTempDir);
-            Directory.CreateDirectory(mTempDir);
-
-            Assert.IsTrue(Directory.Exists(mTempDir),
-                          "Temporary directory '{0}' could not be created", mTempDir);
-        }
-
-        /// <summary>
-        ///   Deletes the temporary folder.
-        /// </summary>
-        [TearDown]
-        public void TestTeardown()
-        {
-            //Give some time for files to unlock
-            Thread.Sleep(500);
-
-            Directory.Delete(mTempDir, true);
-
-            Assert.IsFalse(Directory.Exists(mTempDir),
-                           "Test cleanup - Temporary directory '{0}' could not be deleted", mTempDir);
-
-            mTempDir = string.Empty;
         }
 
         /// <summary>
@@ -320,11 +329,6 @@ namespace AirCannon.Framework.Tests.Models
                           launcher.WorkingDirectory);
             Assert.IsTrue(string.IsNullOrEmpty(wdError),
                           "The WorkingDirectory property should not cause an error when the directory exists");
-        }
-
-        private string _GetExistingFilePath()
-        {
-            return new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
         }
     }
 }

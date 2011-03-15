@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MbUnit.Framework;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Utilities
 {
@@ -20,7 +20,8 @@ namespace AirCannon.Framework.Tests.Utilities
         public static void ContainsKeyAndValue<TKey, TValue>(
             IDictionary<TKey, TValue> dictionary, TKey expectedKey, TValue expectedValue)
         {
-            Assert.ContainsKey(dictionary, expectedKey);
+            Assert.IsTrue(dictionary.ContainsKey(expectedKey),
+                          "Expected the dictionary to contain key {0}", expectedKey);
             Assert.AreEqual(expectedValue, dictionary[expectedKey],
                             "Expected {0} for value of key {1}",
                             expectedValue, expectedKey);

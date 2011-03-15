@@ -1,15 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AirCannon.Framework.Services;
-using MbUnit.Framework;
+﻿using AirCannon.Framework.Services;
+using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Services
 {
     [TestFixture]
     public class ServiceTests
     {
+        private interface INeverImplementedService
+        {
+        }
+
+        private interface ITestService
+        {
+        }
+
+        private class TestService : ITestService
+        {
+        }
+
         /// <summary>
         ///   Verifies that service instances can be switched with <see cref = "Service{TService}.Register" />.
         /// </summary>
@@ -38,7 +46,8 @@ namespace AirCannon.Framework.Tests.Services
             Service<ITestService>.Register(new TestService());
 
             Assert.IsNotNull(Service<ITestService>.Instance, "Instance should not be null");
-            Assert.IsInstanceOfType<TestService>(Service<ITestService>.Instance, "Instance should be a TestService");
+            Assert.That(Service<ITestService>.Instance, Is.TypeOf<TestService>(),
+                        "Instance should be a TestService");
         }
 
         /// <summary>
@@ -50,29 +59,5 @@ namespace AirCannon.Framework.Tests.Services
             Assert.IsNull(Service<INeverImplementedService>.Instance,
                           "An Instance for an unregistered service should be null");
         }
-
-        #region Nested type: INeverImplementedService
-
-        private interface INeverImplementedService
-        {
-        }
-
-        #endregion
-
-        #region Nested type: ITestService
-
-        private interface ITestService
-        {
-        }
-
-        #endregion
-
-        #region Nested type: TestService
-
-        private class TestService : ITestService
-        {
-        }
-
-        #endregion
     }
 }
