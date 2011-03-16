@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="AirCannon.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="300" Background="LightBlue">
+	<UserControl.Resources>
+		<Style TargetType="TextBlock" x:Key="PaddedTextblock">
+			<Setter Property="Margin" Value="10 4 10 4" />
+			<Setter Property="TextWrapping" Value="Wrap" />
+		</Style>
+        <Style TargetType="TextBlock" x:Key="Shoutout"
+               BasedOn="{StaticResource ResourceKey=PaddedTextblock}">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock FontSize="20" Style="{StaticResource ResourceKey=PaddedTextblock}">
+			Air Cannon
+			<LineBreak />
+			<TextBlock FontSize="13" Margin="5 0 0 0">
+				<Run Text="{Binding Path=Version, Source={x:Static Application.Current}, Mode=OneWay, FallbackValue='0.0.0.0'}" />
+				<LineBreak />
+				<Run Text="{Binding Path=Copyright, Source={x:Static Application.Current}, Mode=OneWay}" />
+			</TextBlock>
+		</TextBlock>
+		<StackPanel Grid.Row="1" Background="Cornsilk">
+            <TextBlock Style="{StaticResource ResourceKey=Shoutout}">
+				JSON support from
+				<Hyperlink NavigateUri="http://json.codeplex.com/"
+				           RequestNavigate="_HandleRequestNavigate">
+					JSON.Net
+				</Hyperlink>
+			</TextBlock>
+			<TextBlock Style="{StaticResource ResourceKey=Shoutout}">
+				Taskbar icon from
+				<Hyperlink NavigateUri="http://www.hardcodet.net/projects/wpf-notifyicon"
+				           RequestNavigate="_HandleRequestNavigate">
+					wpf-notifyicon
+				</Hyperlink>
+            </TextBlock>
+            <TextBlock Style="{StaticResource ResourceKey=Shoutout}">
+				Icons from Mark James'
+				<Hyperlink NavigateUri="http://www.famfamfam.com/lab/icons/silk/"
+                        RequestNavigate="_HandleRequestNavigate">Silk icon set 1.3</Hyperlink>
+            </TextBlock>
+        </StackPanel>
+	</Grid>
+</UserControl>

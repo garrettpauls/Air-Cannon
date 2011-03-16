@@ -1,6 +1,7 @@
 ﻿# Build directories and files
 obj/
 bin/
+Build/Release/
 *.exe
 *.dll
 *.manifest

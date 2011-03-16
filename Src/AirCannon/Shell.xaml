@@ -1,0 +1,58 @@
+﻿<Window x:Class="AirCannon.Shell"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Views="clr-namespace:AirCannon.Views"
+        xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
+        xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification" xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework"
+        Title="Air Cannon" SizeToContent="WidthAndHeight"
+        Icon="/Resources/Icons/application_go.png">
+	<Window.DataContext>
+		<ViewModels:MainViewModel x:Name="mMainViewModel" />
+	</Window.DataContext>
+	<Window.InputBindings>
+		<KeyBinding Command="{Binding NewCommand}" Key="N" Modifiers="Control" />
+		<KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Control" />
+		<KeyBinding Command="{Binding SaveAsCommand}" Key="S" Modifiers="Control+Shift" />
+		<KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Control" />
+	</Window.InputBindings>
+	<Grid>
+		<Views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+		<HC:TaskbarIcon IconSource="Resources/Icons/application_go.ico"
+		                DoubleClickCommand="{Binding Path=ToggleMainWindowCommand}">
+			<HC:TaskbarIcon.ContextMenu>
+				<ContextMenu ItemsSource="{Binding Path=Root.Children}">
+					<ContextMenu.Resources>
+						<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
+							<TextBlock Text="{Binding Path=Name}" />
+						</DataTemplate>
+						<HierarchicalDataTemplate DataType="{x:Type ViewModels:LaunchGroupViewModel}"
+						                          ItemsSource="{Binding Path=Children}">
+							<TextBlock Text="{Binding Path=Name}" />
+						</HierarchicalDataTemplate>
+					</ContextMenu.Resources>
+					<ContextMenu.ItemContainerStyleSelector>
+						<WPF:TypedStyleSelector>
+							<WPF:TypedStyleSelector.Styles>
+								<WPF:TypeStylePair Type="{x:Type ViewModels:LauncherViewModel}">
+									<Style TargetType="MenuItem">
+										<Setter Property="Command"
+										        Value="{Binding Path=LaunchCommand}" />
+										<Setter Property="Icon">
+											<Setter.Value>
+												<Image Source="/Resources/Icons/bullet_go.png"
+												       Width="16" Height="16" />
+											</Setter.Value>
+										</Setter>
+										<Setter Property="ToolTip" Value="{Binding Path=Error}" />
+										<Setter Property="ToolTipService.ShowOnDisabled"
+										        Value="True" />
+									</Style>
+								</WPF:TypeStylePair>
+							</WPF:TypedStyleSelector.Styles>
+						</WPF:TypedStyleSelector>
+					</ContextMenu.ItemContainerStyleSelector>
+				</ContextMenu>
+			</HC:TaskbarIcon.ContextMenu>
+		</HC:TaskbarIcon>
+	</Grid>
+</Window>
