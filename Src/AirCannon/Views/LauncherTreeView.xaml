@@ -27,6 +27,8 @@
 							          Command="{Binding Path=AddLauncherCommand}" />
 							<MenuItem Header="Add Launch _Group"
 							          Command="{Binding Path=AddLaunchGroupCommand}" />
+							<MenuItem Header="_Delete"
+							          Command="{Binding Path=DeleteCommand}" />
 						</ContextMenu>
 					</TextBlock.ContextMenu>
 				</TextBlock>
@@ -40,6 +42,7 @@
 						<TextBlock.ContextMenu>
 							<ContextMenu>
 								<MenuItem Header="_Launch" Command="{Binding Path=LaunchCommand}" />
+								<MenuItem Header="_Delete" Command="{Binding Path=DeleteCommand}" />
 							</ContextMenu>
 						</TextBlock.ContextMenu>
 					</TextBlock>

@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using AirCannon.Framework.Models;
+using AirCannon.Framework.Utilities;
 using NUnit.Framework;
 
 namespace AirCannon.Framework.Tests.Models
@@ -10,6 +13,44 @@ namespace AirCannon.Framework.Tests.Models
     [TestFixture]
     public class LaunchGroupTests
     {
+        /// <summary>
+        ///   Determines if two <see cref = "LaunchGroup" />s are semantically equal.
+        /// </summary>
+        private void _Equal(LaunchGroup left, LaunchGroup right)
+        {
+            Assert.AreEqual(left.Name, right.Name, "Names must be equal");
+            Assert.AreEqual(left.EnvironmentVariables, right.EnvironmentVariables,
+                            "Environment variables must be equal");
+
+            Assert.AreEqual(left.Groups.Count, right.Groups.Count,
+                            "Group collections must have the same count");
+
+            foreach (var comp in left.Groups.Zip(right.Groups, LinqEx.ToTuple))
+            {
+                _Equal(comp.Item1, comp.Item2);
+            }
+
+            Assert.AreEqual(left.Launchers.Count, right.Launchers.Count,
+                            "Launcher collections must have the same count");
+
+            foreach (var comp in left.Launchers.Zip(right.Launchers, LinqEx.ToTuple))
+            {
+                _Equal(comp.Item1, comp.Item2);
+            }
+        }
+
+        /// <summary>
+        ///   Determines if two <see cref = "Launcher" />s are semantically equal.
+        /// </summary>
+        private void _Equal(Launcher left, Launcher right)
+        {
+            Assert.AreEqual(left.Arguments, right.Arguments, "Launcher arguments must be equal");
+            Assert.AreEqual(left.EnvironmentVariables, right.EnvironmentVariables, "EnvironmentVariables must be equal");
+            Assert.AreEqual(left.File, right.File, "File must be equal");
+            Assert.AreEqual(left.Name, right.Name, "Name must be equal");
+            Assert.AreEqual(left.WorkingDirectory, right.WorkingDirectory, "WorkingDirectories must be equal");
+        }
+
         /// <summary>
         ///   Verifies the <see cref = "LaunchGroup.ClearAllHasChanges" /> method sets all child
         ///   <see cref = "LaunchGroup.HasChanges" /> and all <see cref = "Launcher.HasChanges" />
@@ -132,7 +173,7 @@ namespace AirCannon.Framework.Tests.Models
 
             Assert.AreNotSame(launchGroup, newGroup, "LoadFrom should have created a new group");
 
-            Assert.AreEqual(launchGroup, newGroup, "LoadFrom should have loaded a group equal to the saved one");
+            _Equal(launchGroup, newGroup);
         }
     }
 }

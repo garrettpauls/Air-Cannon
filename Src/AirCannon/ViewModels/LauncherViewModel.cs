@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
@@ -27,6 +24,8 @@ namespace AirCannon.ViewModels
                     Property<LauncherViewModel>.Name(p => p.WorkingDirectory),
                 };
 
+        private DelegateCommand mDeleteCommand;
+
         private bool mIsSelected;
         private DelegateCommand mLaunchCommand;
         private LaunchGroupViewModel mParent;
@@ -48,6 +47,21 @@ namespace AirCannon.ViewModels
         {
             get { return Model.Arguments; }
             set { Model.Arguments = value; }
+        }
+
+        /// <summary>
+        ///   Gets the command to delete this group from its parent.
+        /// </summary>
+        public DelegateCommand DeleteCommand
+        {
+            get
+            {
+                if (mDeleteCommand == null)
+                {
+                    mDeleteCommand = new DelegateCommand(_Delete, () => Model.Parent != null);
+                }
+                return mDeleteCommand;
+            }
         }
 
         /// <summary>
@@ -187,6 +201,61 @@ namespace AirCannon.ViewModels
         #endregion
 
         /// <summary>
+        ///   Determines whether the specified <see cref = "LauncherViewModel" /> is equal to this instance.
+        /// </summary>
+        /// <param name = "other">The <see cref = "LauncherViewModel" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref = "LauncherViewModel" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
+        public bool Equals(LauncherViewModel other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return other.Model.Equals(Model);
+        }
+
+        /// <summary>
+        ///   Determines whether the specified <see cref = "System.Object" /> is equal to this instance.
+        /// </summary>
+        /// <param name = "obj">The <see cref = "System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref = "System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (LauncherViewModel))
+            {
+                return false;
+            }
+            return Equals((LauncherViewModel) obj);
+        }
+
+        /// <summary>
+        ///   Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        ///   A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return Model.GetHashCode();
+        }
+
+        /// <summary>
         ///   Called when a property on the model is changed. 
         ///   Used to pass through property changed events and
         ///   update the parent view model instance.
@@ -211,6 +280,14 @@ namespace AirCannon.ViewModels
         private bool _CanLaunch()
         {
             return Model.IsValid;
+        }
+
+        /// <summary>
+        ///   Deletes this launcher from its parent.
+        /// </summary>
+        private void _Delete()
+        {
+            Model.Parent.Delete(Model);
         }
 
         /// <summary>

@@ -198,73 +198,19 @@ namespace AirCannon.Framework.Models
         }
 
         /// <summary>
-        ///   Determines whether the specified <see cref = "LaunchGroup" /> is equal to the current <see cref = "LaunchGroup" />.
+        ///   Deletes the specified child group.
         /// </summary>
-        /// <returns>
-        ///   true if the specified <see cref = "LaunchGroup" /> is equal to the current <see cref = "LaunchGroup" />; otherwise, false.
-        /// </returns>
-        /// <param name = "other">The <see cref = "LaunchGroup" /> to compare with the current <see cref = "LaunchGroup" />. </param>
-        /// <filterpriority>2</filterpriority>
-        public bool Equals(LaunchGroup other)
+        public void Delete(LaunchGroup childGroup)
         {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            return Equals(other.mEnvironmentVariables, mEnvironmentVariables) &&
-                   other.mGroups != null && mGroups != null &&
-                   other.mGroups.SequenceEqual(mGroups) &&
-                   other.mLaunchers != null && mLaunchers != null &&
-                   other.mLaunchers.SequenceEqual(mLaunchers) &&
-                   Equals(other.mName, mName);
+            Groups.Remove(childGroup);
         }
 
         /// <summary>
-        ///   Determines whether the specified <see cref = "T:System.Object" /> is equal to the current <see cref = "T:System.Object" />.
+        ///   Deletes the specified child launcher.
         /// </summary>
-        /// <returns>
-        ///   true if the specified <see cref = "T:System.Object" /> is equal to the current <see cref = "T:System.Object" />; otherwise, false.
-        /// </returns>
-        /// <param name = "obj">The <see cref = "T:System.Object" /> to compare with the current <see cref = "T:System.Object" />. </param>
-        /// <filterpriority>2</filterpriority>
-        public override bool Equals(object obj)
+        public void Delete(Launcher childLauncher)
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-            if (obj.GetType() != typeof (LaunchGroup))
-            {
-                return false;
-            }
-            return Equals((LaunchGroup) obj);
-        }
-
-        /// <summary>
-        ///   Serves as a hash function for a particular type.
-        /// </summary>
-        /// <returns>
-        ///   A hash code for the current <see cref = "T:System.Object" />.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int result = (mEnvironmentVariables != null ? mEnvironmentVariables.GetHashCode() : 0);
-                result = (result*397) ^ (mGroups != null ? mGroups.GetHashCode() : 0);
-                result = (result*397) ^ (mLaunchers != null ? mLaunchers.GetHashCode() : 0);
-                result = (result*397) ^ (mName != null ? mName.GetHashCode() : 0);
-                return result;
-            }
+            Launchers.Remove(childLauncher);
         }
 
         /// <summary>
@@ -348,10 +294,21 @@ namespace AirCannon.Framework.Models
         /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
         private void _HandleGroupCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            foreach (LaunchGroup group in e.NewItems)
+            if (e.NewItems != null)
             {
-                group.Parent = this;
-                group.PropertyChanged += _HandleChildGroupPropertyChanged;
+                foreach (LaunchGroup group in e.NewItems)
+                {
+                    group.Parent = this;
+                    group.PropertyChanged += _HandleChildGroupPropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (LaunchGroup group in e.OldItems)
+                {
+                    group.PropertyChanged -= _HandleChildGroupPropertyChanged;
+                }
             }
 
             HasChanges = true;
@@ -365,10 +322,21 @@ namespace AirCannon.Framework.Models
         /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
         private void _HandleLauncherCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            foreach (Launcher launcher in e.NewItems)
+            if (e.NewItems != null)
             {
-                launcher.Parent = this;
-                launcher.PropertyChanged += _HandleChildLauncherPropertyChanged;
+                foreach (Launcher launcher in e.NewItems)
+                {
+                    launcher.Parent = this;
+                    launcher.PropertyChanged += _HandleChildLauncherPropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (Launcher launcher in e.OldItems)
+                {
+                    launcher.PropertyChanged -= _HandleChildLauncherPropertyChanged;
+                }
             }
 
             HasChanges = true;

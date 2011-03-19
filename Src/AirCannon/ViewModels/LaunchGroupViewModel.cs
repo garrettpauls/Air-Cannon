@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using AirCannon.Framework.Models;
@@ -25,6 +24,7 @@ namespace AirCannon.ViewModels
 
         private DelegateCommand mAddLaunchGroupCommand;
         private DelegateCommand mAddLauncherCommand;
+        private DelegateCommand mDeleteCommand;
         private bool mIsExpanded;
         private bool mIsSelected;
         private ReadOnlyWrappingCollection<LaunchGroupViewModel, LaunchGroup> mLaunchGroups;
@@ -79,6 +79,21 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
+        ///   Gets the command to delete this group from its parent.
+        /// </summary>
+        public DelegateCommand DeleteCommand
+        {
+            get
+            {
+                if (mDeleteCommand == null)
+                {
+                    mDeleteCommand = new DelegateCommand(_Delete, () => Model.Parent != null);
+                }
+                return mDeleteCommand;
+            }
+        }
+
+        /// <summary>
         ///   Gets the environment variables used to launch any child apps.
         /// </summary>
         public EnvironmentVariableCollection EnvironmentVariables
@@ -98,7 +113,7 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is expanded.
+        ///   Gets or sets a value indicating whether this instance is expanded.
         /// </summary>
         public bool IsExpanded
         {
@@ -114,7 +129,7 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is selected.
+        ///   Gets or sets a value indicating whether this instance is selected.
         /// </summary>
         public bool IsSelected
         {
@@ -191,6 +206,61 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
+        ///   Determines whether the specified <see cref = "LaunchGroupViewModel" /> is equal to this instance.
+        /// </summary>
+        /// <param name = "other">The <see cref = "LaunchGroupViewModel" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref = "LaunchGroupViewModel" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
+        public bool Equals(LaunchGroupViewModel other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return other.Model.Equals(Model);
+        }
+
+        /// <summary>
+        ///   Determines whether the specified <see cref = "System.Object" /> is equal to this instance.
+        /// </summary>
+        /// <param name = "obj">The <see cref = "System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref = "System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (LaunchGroupViewModel))
+            {
+                return false;
+            }
+            return Equals((LaunchGroupViewModel) obj);
+        }
+
+        /// <summary>
+        ///   Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        ///   A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return Model.GetHashCode();
+        }
+
+        /// <summary>
         ///   Called when a model property is changed. Used to pass through property changed events.
         /// </summary>
         protected override void OnBasePropertyChanged(string propertyName)
@@ -223,6 +293,14 @@ namespace AirCannon.ViewModels
                                     {
                                         Name = "New launcher"
                                     });
+        }
+
+        /// <summary>
+        ///   Deletes this launch group from its parent.
+        /// </summary>
+        private void _Delete()
+        {
+            Model.Parent.Delete(Model);
         }
 
         /// <summary>
