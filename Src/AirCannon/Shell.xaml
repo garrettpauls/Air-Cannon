@@ -37,18 +37,19 @@
 							<WPF:TypedStyleSelector.Styles>
 								<WPF:TypeStylePair Type="{x:Type ViewModels:LauncherViewModel}">
 									<Style TargetType="MenuItem">
+                                        <Style.Resources>
+                                            <Image x:Key="BulletGo"
+                                                    Source="Resources/Icons/bullet_go.png"
+                                                    Width="16" Height="16" x:Shared="false" />
+                                        </Style.Resources>
 										<Setter Property="Command"
 										        Value="{Binding Path=LaunchCommand}" />
-										<Setter Property="Icon">
-											<Setter.Value>
-												<Image Source="/Resources/Icons/bullet_go.png"
-												       Width="16" Height="16" />
-											</Setter.Value>
-										</Setter>
-										<Setter Property="ToolTip" Value="{Binding Path=Error}" />
+                                        <Setter Property="Icon" Value="{StaticResource ResourceKey=BulletGo}" />
+                                        <Setter Property="ToolTip" Value="{Binding Path=Error}" />
 										<Setter Property="ToolTipService.ShowOnDisabled"
 										        Value="True" />
-									</Style>
+                                        <Setter Property="Background" Value="Blue" />
+                                    </Style>
 								</WPF:TypeStylePair>
 							</WPF:TypedStyleSelector.Styles>
 						</WPF:TypedStyleSelector>

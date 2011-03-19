@@ -34,7 +34,7 @@
 				</TextBlock>
 			</HierarchicalDataTemplate>
 			<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
-				<StackPanel Orientation="Horizontal">
+				<StackPanel Orientation="Horizontal" Margin="-16 0 0 0">
 					<Image Source="/Resources/Icons/bullet_go.png"
 					       Width="16" Height="16" />
 					<TextBlock Text="{Binding Name}"
