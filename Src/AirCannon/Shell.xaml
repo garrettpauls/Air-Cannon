@@ -4,9 +4,10 @@
         xmlns:Views="clr-namespace:AirCannon.Views"
         xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
         xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification" 
-        xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework"
-        Title="Air Cannon" SizeToContent="WidthAndHeight"
-        Icon="/Resources/Icons/application_go.png"
+        xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework" xmlns:Properties="clr-namespace:AirCannon.Properties"
+        Title="Air Cannon" Icon="/Resources/Icons/application_go.png"
+        Width="{Binding Source={x:Static Member=Properties:Settings.Default}, Path=ShellWidth, Mode=TwoWay}"
+        Height="{Binding Source={x:Static Member=Properties:Settings.Default}, Path=ShellHeight, Mode=TwoWay}"
         StateChanged="_HandleWindowStateChanged">
 	<Window.DataContext>
 		<ViewModels:MainViewModel x:Name="mMainViewModel" />

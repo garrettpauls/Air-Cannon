@@ -34,5 +34,29 @@ namespace AirCannon.Properties {
                 this["CurrentFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("400")]
+        public int ShellWidth {
+            get {
+                return ((int)(this["ShellWidth"]));
+            }
+            set {
+                this["ShellWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int ShellHeight {
+            get {
+                return ((int)(this["ShellHeight"]));
+            }
+            set {
+                this["ShellHeight"] = value;
+            }
+        }
     }
 }
