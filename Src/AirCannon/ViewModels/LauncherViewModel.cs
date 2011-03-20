@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Windows.Forms;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 using IOFile=System.IO.File;
+using OpenFileDialog=Microsoft.Win32.OpenFileDialog;
 
 namespace AirCannon.ViewModels
 {
@@ -25,9 +29,10 @@ namespace AirCannon.ViewModels
                 };
 
         private DelegateCommand mDeleteCommand;
-
         private bool mIsSelected;
         private DelegateCommand mLaunchCommand;
+        private DelegateCommand mLookupFileCommand;
+        private DelegateCommand mLookupWorkingDirectoryCommand;
         private LaunchGroupViewModel mParent;
 
         /// <summary>
@@ -140,6 +145,37 @@ namespace AirCannon.ViewModels
                     mLaunchCommand = new DelegateCommand(_Launch, _CanLaunch);
                 }
                 return mLaunchCommand;
+            }
+        }
+
+        /// <summary>
+        ///   Gets the command to prompt the user for a file.
+        /// </summary>
+        public DelegateCommand LookupFileCommand
+        {
+            get
+            {
+                if (mLookupFileCommand == null)
+                {
+                    mLookupFileCommand = new DelegateCommand(_LookupFile);
+                }
+                return mLookupFileCommand;
+            }
+        }
+
+        /// <summary>
+        ///   Gets the command to prompt the user for a directory.
+        /// </summary>
+        public DelegateCommand LookupWorkingDirectoryCommand
+        {
+            get
+            {
+                if (mLookupWorkingDirectoryCommand == null)
+                {
+                    mLookupWorkingDirectoryCommand =
+                        new DelegateCommand(_LookupWorkingDirectory);
+                }
+                return mLookupWorkingDirectoryCommand;
             }
         }
 
@@ -296,6 +332,45 @@ namespace AirCannon.ViewModels
         private void _Launch()
         {
             Model.Launch();
+        }
+
+        /// <summary>
+        ///   Prompts the user to select a file.
+        /// </summary>
+        private void _LookupFile()
+        {
+            var dialog = new OpenFileDialog();
+            dialog.CheckFileExists = true;
+            dialog.CheckPathExists = true;
+            dialog.RestoreDirectory = true;
+            if (!string.IsNullOrEmpty(File) &&
+                Directory.Exists(Path.GetDirectoryName(File)))
+            {
+                dialog.InitialDirectory = Path.GetDirectoryName(File);
+            }
+
+            if (dialog.ShowDialog().Value)
+            {
+                File = dialog.FileName;
+            }
+        }
+
+        /// <summary>
+        ///   Prompts the user for a working directory.
+        /// </summary>
+        private void _LookupWorkingDirectory()
+        {
+            using (var dialog = new FolderBrowserDialog())
+            {
+                if (Directory.Exists(WorkingDirectory))
+                {
+                    dialog.SelectedPath = WorkingDirectory;
+                }
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    WorkingDirectory = dialog.SelectedPath;
+                }
+            }
         }
     }
 }
