@@ -37,7 +37,7 @@ namespace AirCannon.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("400")]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
         public int ShellWidth {
             get {
                 return ((int)(this["ShellWidth"]));
@@ -49,13 +49,25 @@ namespace AirCannon.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        [global::System.Configuration.DefaultSettingValueAttribute("400")]
         public int ShellHeight {
             get {
                 return ((int)(this["ShellHeight"]));
             }
             set {
                 this["ShellHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ShellState {
+            get {
+                return ((string)(this["ShellState"]));
+            }
+            set {
+                this["ShellState"] = value;
             }
         }
     }
