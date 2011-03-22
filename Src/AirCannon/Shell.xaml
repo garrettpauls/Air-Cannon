@@ -4,7 +4,8 @@
         xmlns:Views="clr-namespace:AirCannon.Views"
         xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
         xmlns:HC="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification" 
-        xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework" xmlns:Properties="clr-namespace:AirCannon.Properties"
+        xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework" 
+        xmlns:Properties="clr-namespace:AirCannon.Properties"
         Title="Air Cannon" Icon="/Resources/Icons/application_go.png"
         Width="{Binding Source={x:Static Member=Properties:Settings.Default}, Path=ShellWidth, Mode=TwoWay}"
         Height="{Binding Source={x:Static Member=Properties:Settings.Default}, Path=ShellHeight, Mode=TwoWay}"
@@ -49,7 +50,6 @@
                                         <Setter Property="ToolTip" Value="{Binding Path=Error}" />
 										<Setter Property="ToolTipService.ShowOnDisabled"
 										        Value="True" />
-                                        <Setter Property="Background" Value="Blue" />
                                     </Style>
 								</WPF:TypeStylePair>
 							</WPF:TypedStyleSelector.Styles>
