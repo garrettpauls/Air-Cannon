@@ -22,10 +22,10 @@ namespace AirCannon.Framework.Tests.Models
             Assert.AreEqual(left.EnvironmentVariables, right.EnvironmentVariables,
                             "Environment variables must be equal");
 
-            Assert.AreEqual(left.Groups.Count, right.Groups.Count,
+            Assert.AreEqual(left.LaunchGroups.Count, right.LaunchGroups.Count,
                             "Group collections must have the same count");
 
-            foreach (var comp in left.Groups.Zip(right.Groups, LinqEx.ToTuple))
+            foreach (var comp in left.LaunchGroups.Zip(right.LaunchGroups, LinqEx.ToTuple))
             {
                 _Equal(comp.Item1, comp.Item2);
             }
@@ -76,17 +76,17 @@ namespace AirCannon.Framework.Tests.Models
                                             }) {HasChanges = true};
 
             Assert.IsTrue(group.HasChanges, "All Groups and Launchers should have changes");
-            Assert.IsTrue(group.Groups[0].HasChanges, "All Groups and Launchers should have changes");
-            Assert.IsTrue(group.Groups[0].Groups[0].HasChanges, "All Groups and Launchers should have changes");
-            Assert.IsTrue(group.Groups[0].Launchers[0].HasChanges, "All Groups and Launchers should have changes");
+            Assert.IsTrue(group.LaunchGroups[0].HasChanges, "All Groups and Launchers should have changes");
+            Assert.IsTrue(group.LaunchGroups[0].LaunchGroups[0].HasChanges, "All Groups and Launchers should have changes");
+            Assert.IsTrue(group.LaunchGroups[0].Launchers[0].HasChanges, "All Groups and Launchers should have changes");
             Assert.IsTrue(group.Launchers[0].HasChanges, "All Groups and Launchers should have changes");
 
             group.ClearAllHasChanges();
 
             Assert.IsFalse(group.HasChanges, "All Groups and Launchers should not have changes");
-            Assert.IsFalse(group.Groups[0].HasChanges, "All Groups and Launchers should not have changes");
-            Assert.IsFalse(group.Groups[0].Groups[0].HasChanges, "All Groups and Launchers should not have changes");
-            Assert.IsFalse(group.Groups[0].Launchers[0].HasChanges, "All Groups and Launchers should not have changes");
+            Assert.IsFalse(group.LaunchGroups[0].HasChanges, "All Groups and Launchers should not have changes");
+            Assert.IsFalse(group.LaunchGroups[0].LaunchGroups[0].HasChanges, "All Groups and Launchers should not have changes");
+            Assert.IsFalse(group.LaunchGroups[0].Launchers[0].HasChanges, "All Groups and Launchers should not have changes");
             Assert.IsFalse(group.Launchers[0].HasChanges, "All Groups and Launchers should not have changes");
         }
 
@@ -114,7 +114,7 @@ namespace AirCannon.Framework.Tests.Models
             Assert.IsTrue(group.HasChanges, "Updating environment variables should cause HasChanges to be true");
 
             group.ClearAllHasChanges();
-            group.Groups.Add(childGroup);
+            group.LaunchGroups.Add(childGroup);
             Assert.IsTrue(group.HasChanges, "New child groups should cause HasChages to be true");
 
             group.ClearAllHasChanges();
@@ -147,7 +147,7 @@ namespace AirCannon.Framework.Tests.Models
                                               {"Var2", "Val2"}
                                           }
                                   };
-            launchGroup.Groups.Add(new LaunchGroup
+            launchGroup.LaunchGroups.Add(new LaunchGroup
                                        {
                                            Name = "LG1",
                                            EnvironmentVariables =

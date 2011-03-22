@@ -19,7 +19,7 @@ namespace AirCannon.Framework.Models
     public class LaunchGroup : NotifyPropertyChangedBase
     {
         private EnvironmentVariableCollection mEnvironmentVariables;
-        private ObservableCollection<LaunchGroup> mGroups;
+        private ObservableCollection<LaunchGroup> mLaunchGroups;
         private bool mHasChanges;
         private ObservableCollection<Launcher> mLaunchers;
         private string mName;
@@ -35,7 +35,7 @@ namespace AirCannon.Framework.Models
                            IEnumerable<LaunchGroup> groups = null,
                            IEnumerable<Launcher> launchers = null)
         {
-            Groups = new ObservableCollection<LaunchGroup>();
+            LaunchGroups = new ObservableCollection<LaunchGroup>();
             Launchers = new ObservableCollection<Launcher>();
             EnvironmentVariables = new EnvironmentVariableCollection();
             Parent = parent;
@@ -46,7 +46,7 @@ namespace AirCannon.Framework.Models
             {
                 foreach (var group in groups)
                 {
-                    Groups.Add(group);
+                    LaunchGroups.Add(group);
                 }
             }
 
@@ -94,19 +94,19 @@ namespace AirCannon.Framework.Models
         /// <summary>
         ///   Gets the child <see cref = "LaunchGroup" />s.
         /// </summary>
-        public ObservableCollection<LaunchGroup> Groups
+        public ObservableCollection<LaunchGroup> LaunchGroups
         {
-            get { return mGroups; }
+            get { return mLaunchGroups; }
             set
             {
-                if (mGroups != null)
+                if (mLaunchGroups != null)
                 {
-                    mGroups.CollectionChanged -= _HandleGroupCollectionChanged;
+                    mLaunchGroups.CollectionChanged -= HandleLaunchGroupCollectionChanged;
                 }
 
-                if (SetPropertyValue(ref mGroups, value, () => Groups))
+                if (SetPropertyValue(ref mLaunchGroups, value, () => LaunchGroups))
                 {
-                    foreach (var launchGroup in mGroups)
+                    foreach (var launchGroup in mLaunchGroups)
                     {
                         launchGroup.Parent = this;
                     }
@@ -114,9 +114,9 @@ namespace AirCannon.Framework.Models
                     HasChanges = true;
                 }
 
-                if (mGroups != null)
+                if (mLaunchGroups != null)
                 {
-                    mGroups.CollectionChanged += _HandleGroupCollectionChanged;
+                    mLaunchGroups.CollectionChanged += HandleLaunchGroupCollectionChanged;
                 }
             }
         }
@@ -186,7 +186,7 @@ namespace AirCannon.Framework.Models
         {
             HasChanges = false;
 
-            foreach (var group in Groups)
+            foreach (var group in LaunchGroups)
             {
                 group.ClearAllHasChanges();
             }
@@ -202,7 +202,7 @@ namespace AirCannon.Framework.Models
         /// </summary>
         public void Delete(LaunchGroup childGroup)
         {
-            Groups.Remove(childGroup);
+            LaunchGroups.Remove(childGroup);
         }
 
         /// <summary>
@@ -292,7 +292,7 @@ namespace AirCannon.Framework.Models
         /// </summary>
         /// <param name = "sender">The source of the event.</param>
         /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
-        private void _HandleGroupCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void HandleLaunchGroupCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {

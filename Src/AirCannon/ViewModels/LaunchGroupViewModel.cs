@@ -25,6 +25,7 @@ namespace AirCannon.ViewModels
         private DelegateCommand mAddLaunchGroupCommand;
         private DelegateCommand mAddLauncherCommand;
         private DelegateCommand mDeleteCommand;
+        private bool mHasChildren;
         private bool mIsExpanded;
         private bool mIsSelected;
         private ReadOnlyWrappingCollection<LaunchGroupViewModel, LaunchGroup> mLaunchGroups;
@@ -38,6 +39,8 @@ namespace AirCannon.ViewModels
         public LaunchGroupViewModel(LaunchGroup model)
         {
             Model = model;
+            HasChildren = Model.Launchers.Count > 0 ||
+                          Model.LaunchGroups.Count > 0;
         }
 
         /// <summary>
@@ -113,6 +116,15 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
+        ///   Gets a value indicating whether this instance has children.
+        /// </summary>
+        public bool HasChildren
+        {
+            get { return mHasChildren; }
+            private set { SetPropertyValue(ref mHasChildren, value, () => HasChildren); }
+        }
+
+        /// <summary>
         ///   Gets or sets a value indicating whether this instance is expanded.
         /// </summary>
         public bool IsExpanded
@@ -154,7 +166,7 @@ namespace AirCannon.ViewModels
                 if (mLaunchGroups == null)
                 {
                     mLaunchGroups = new ReadOnlyWrappingCollection<LaunchGroupViewModel, LaunchGroup>(
-                        Model.Groups, group => new LaunchGroupViewModel(group), vm => vm.Model);
+                        Model.LaunchGroups, group => new LaunchGroupViewModel(group), vm => vm.Model);
                     mLaunchGroups.CollectionChanged += _HandleChildCollectionChanged;
                 }
 
@@ -278,7 +290,7 @@ namespace AirCannon.ViewModels
         /// </summary>
         private void _AddLaunchGroup()
         {
-            Model.Groups.Add(new LaunchGroup(Model)
+            Model.LaunchGroups.Add(new LaunchGroup(Model)
                                  {
                                      Name = "New launch group"
                                  });
@@ -312,6 +324,8 @@ namespace AirCannon.ViewModels
         private void _HandleChildCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(() => Children);
+            HasChildren = Launchers.Count > 0 ||
+                          LaunchGroups.Count > 0;
         }
     }
 }

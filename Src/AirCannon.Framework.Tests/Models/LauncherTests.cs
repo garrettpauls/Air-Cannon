@@ -86,7 +86,7 @@ namespace AirCannon.Framework.Tests.Models
                 new EnvironmentVariable("B", "B"),
                 new EnvironmentVariable("D", "D"));
 
-            group.Groups[0].EnvironmentVariables.UpdateWith(
+            group.LaunchGroups[0].EnvironmentVariables.UpdateWith(
                 new EnvironmentVariable("C", "C"),
                 new EnvironmentVariable("B", "B2"));
 

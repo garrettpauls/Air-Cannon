@@ -4,56 +4,71 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
-	<TreeView ItemsSource="{Binding Path=Children}" SelectedItemChanged="_HandleSelectedItemChanged" x:Name="mTreeView">
-		<TreeView.Resources>
-			<Style TargetType="TreeViewItem">
-				<Setter Property="IsSelected" Value="{Binding Path=IsSelected}" />
-				<Setter Property="IsExpanded" Value="{Binding Path=IsExpanded}" />
-			</Style>
-			<Style TargetType="TextBlock" x:Key="HasChangesTextBlockStyle">
-				<Style.Triggers>
-					<DataTrigger Binding="{Binding Path=HasChanges}" Value="True">
-						<Setter Property="FontWeight" Value="Bold" />
-					</DataTrigger>
-				</Style.Triggers>
-			</Style>
-			<HierarchicalDataTemplate DataType="{x:Type ViewModels:LaunchGroupViewModel}"
-			                          ItemsSource="{Binding Children}">
-				<TextBlock Text="{Binding Name}"
-				           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
-					<TextBlock.ContextMenu>
-						<ContextMenu>
-							<MenuItem Header="Add _Launcher"
-							          Command="{Binding Path=AddLauncherCommand}" />
-							<MenuItem Header="Add Launch _Group"
-							          Command="{Binding Path=AddLaunchGroupCommand}" />
-							<MenuItem Header="_Delete"
-							          Command="{Binding Path=DeleteCommand}" />
-						</ContextMenu>
-					</TextBlock.ContextMenu>
-				</TextBlock>
-			</HierarchicalDataTemplate>
-			<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
-				<StackPanel Orientation="Horizontal" Margin="-16 0 0 0">
-					<Image Source="/Resources/Icons/bullet_go.png"
-					       Width="16" Height="16" />
+	<Grid>
+		<TreeView ItemsSource="{Binding Path=Children}" SelectedItemChanged="_HandleSelectedItemChanged" x:Name="mTreeView">
+			<TreeView.Resources>
+				<Style TargetType="TreeViewItem">
+					<Setter Property="IsSelected" Value="{Binding Path=IsSelected}" />
+					<Setter Property="IsExpanded" Value="{Binding Path=IsExpanded}" />
+				</Style>
+				<Style TargetType="TextBlock" x:Key="HasChangesTextBlockStyle">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Path=HasChanges}" Value="True">
+							<Setter Property="FontWeight" Value="Bold" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+				<HierarchicalDataTemplate DataType="{x:Type ViewModels:LaunchGroupViewModel}"
+				                          ItemsSource="{Binding Children}">
 					<TextBlock Text="{Binding Name}"
 					           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
 						<TextBlock.ContextMenu>
 							<ContextMenu>
-								<MenuItem Header="_Launch" Command="{Binding Path=LaunchCommand}" />
-								<MenuItem Header="_Delete" Command="{Binding Path=DeleteCommand}" />
+								<MenuItem Header="Add _Launcher"
+								          Command="{Binding Path=AddLauncherCommand}" />
+								<MenuItem Header="Add Launch _Group"
+								          Command="{Binding Path=AddLaunchGroupCommand}" />
+								<MenuItem Header="_Delete"
+								          Command="{Binding Path=DeleteCommand}" />
 							</ContextMenu>
 						</TextBlock.ContextMenu>
 					</TextBlock>
-				</StackPanel>
-			</DataTemplate>
-		</TreeView.Resources>
-		<TreeView.ContextMenu>
-			<ContextMenu>
-				<MenuItem Header="Add _Launcher" Command="{Binding Path=AddLauncherCommand}" />
-				<MenuItem Header="Add Launch _Group" Command="{Binding Path=AddLaunchGroupCommand}" />
-			</ContextMenu>
-		</TreeView.ContextMenu>
-	</TreeView>
+				</HierarchicalDataTemplate>
+				<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
+					<StackPanel Orientation="Horizontal" Margin="-16 0 0 0">
+						<Image Source="/Resources/Icons/bullet_go.png"
+						       Width="16" Height="16" />
+						<TextBlock Text="{Binding Name}"
+						           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
+							<TextBlock.ContextMenu>
+								<ContextMenu>
+									<MenuItem Header="_Launch" Command="{Binding Path=LaunchCommand}" />
+									<MenuItem Header="_Delete" Command="{Binding Path=DeleteCommand}" />
+								</ContextMenu>
+							</TextBlock.ContextMenu>
+						</TextBlock>
+					</StackPanel>
+				</DataTemplate>
+			</TreeView.Resources>
+			<TreeView.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="Add _Launcher" Command="{Binding Path=AddLauncherCommand}" />
+					<MenuItem Header="Add Launch _Group" Command="{Binding Path=AddLaunchGroupCommand}" />
+				</ContextMenu>
+			</TreeView.ContextMenu>
+		</TreeView>
+        <TextBlock Text="Right-click to add launchers" TextWrapping="Wrap" 
+                   IsHitTestVisible="False" Padding="10 10 10 10"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=HasChildren}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </Grid>
 </UserControl>
