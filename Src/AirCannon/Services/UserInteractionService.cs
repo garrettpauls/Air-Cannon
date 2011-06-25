@@ -41,10 +41,9 @@ namespace AirCannon.Services
             var window = new UserInteractionServicePromptWindow();
             window.Title = caption;
             window.Message = message;
-            // We want the option buttons pushed to the right, which requires
-            // a flow direction of Right-to-Left, so we add the options
-            // in reverse order to still get them ordered correctly.
-            foreach (var option in options.Reverse())
+            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            window.Owner = App.Current.MainWindow;
+            foreach (var option in options)
             {
                 window.Options.Add(option);
             }

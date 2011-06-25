@@ -1,8 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Services;
+using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 using AirCannon.Properties;
 using AirCannon.Views;
@@ -91,6 +94,7 @@ namespace AirCannon.ViewModels
                     SaveAsCommand.RaiseCanExecuteChanged();
                     if (Root != null)
                     {
+                        Root.PropertyChanged += _HandleRootPropertyChanged;
                         var firstItem = Root.Children.FirstOrDefault();
                         if (firstItem is LauncherViewModel)
                         {
@@ -114,7 +118,7 @@ namespace AirCannon.ViewModels
             {
                 if (mSaveAsCommand == null)
                 {
-                    mSaveAsCommand = new DelegateCommand(() => _SaveAs(), _CanSave);
+                    mSaveAsCommand = new DelegateCommand(() => _SaveAs(), () => Root != null);
                 }
                 return mSaveAsCommand;
             }
@@ -151,7 +155,7 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
-        /// Gets a command to toggle the visibility of the main window.
+        ///   Gets a command to toggle the visibility of the main window.
         /// </summary>
         public DelegateCommand ToggleMainWindowCommand
         {
@@ -159,7 +163,8 @@ namespace AirCannon.ViewModels
             {
                 if (mToggleMainWindowCommand == null)
                 {
-                    mToggleMainWindowCommand = new DelegateCommand(App.Current.Shell.ToggleVisibility, _CanToggleMainWindow);
+                    mToggleMainWindowCommand = new DelegateCommand(App.Current.Shell.ToggleVisibility,
+                                                                   _CanToggleMainWindow);
                 }
                 return mToggleMainWindowCommand;
             }
@@ -170,7 +175,7 @@ namespace AirCannon.ViewModels
         /// </summary>
         private bool _CanSave()
         {
-            return Root != null;
+            return Root != null && Root.HasChanges;
         }
 
         /// <summary>
@@ -180,6 +185,18 @@ namespace AirCannon.ViewModels
         private bool _CanToggleMainWindow()
         {
             return Application.Current.MainWindow != null;
+        }
+
+        /// <summary>
+        ///   Handles the PropertyChanged event of the Root view model.
+        /// </summary>
+        private void _HandleRootPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Property.Name(() => Root.HasChanges))
+            {
+                SaveCommand.RaiseCanExecuteChanged();
+                SaveAsCommand.RaiseCanExecuteChanged();
+            }
         }
 
         /// <summary>

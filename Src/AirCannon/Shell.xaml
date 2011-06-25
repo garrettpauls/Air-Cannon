@@ -10,7 +10,7 @@
         Width="{Binding Source={x:Static Member=Properties:Settings.Default}, Path=ShellWidth, Mode=TwoWay, FallbackValue=500}"
         Height="{Binding Source={x:Static Member=Properties:Settings.Default}, Path=ShellHeight, Mode=TwoWay, FallbackValue=400}"
         WindowState="{Binding Source={x:Static Member=Properties:Settings.Default}, Path=ShellState, Mode=TwoWay, FallbackValue=Normal}"
-        StateChanged="_HandleWindowStateChanged">
+        StateChanged="_HandleWindowStateChanged" Closing="_HandleClosing" >
 	<Window.DataContext>
 		<ViewModels:MainViewModel x:Name="mMainViewModel" />
 	</Window.DataContext>

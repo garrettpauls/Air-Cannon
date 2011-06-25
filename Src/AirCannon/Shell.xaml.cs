@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
+using AirCannon.ViewModels;
 
 namespace AirCannon
 {
@@ -17,6 +19,14 @@ namespace AirCannon
             InitializeComponent();
 
             _DebugHook();
+        }
+
+        /// <summary>
+        ///   Gets the view model associated with the shell.
+        /// </summary>
+        public MainViewModel ViewModel
+        {
+            get { return mMainViewModel; }
         }
 
         /// <summary>
@@ -55,6 +65,16 @@ namespace AirCannon
         private void _DebugHook()
         {
             Mouse.AddMouseDownHandler(this, _DebugHandleMouseDown);
+        }
+
+        /// <summary>
+        ///   Handles the Closing event of the window.
+        ///   Prevents closing and calls the exit command.
+        /// </summary>
+        private void _HandleClosing(object sender, CancelEventArgs e)
+        {
+            e.Cancel = true;
+            App.ExitCommand.Execute();
         }
 
         /// <summary>

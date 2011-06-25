@@ -19,8 +19,8 @@ namespace AirCannon.Framework.Models
     public class LaunchGroup : NotifyPropertyChangedBase
     {
         private EnvironmentVariableCollection mEnvironmentVariables;
-        private ObservableCollection<LaunchGroup> mLaunchGroups;
         private bool mHasChanges;
+        private ObservableCollection<LaunchGroup> mLaunchGroups;
         private ObservableCollection<Launcher> mLaunchers;
         private string mName;
         private LaunchGroup mParent;
@@ -92,6 +92,16 @@ namespace AirCannon.Framework.Models
         }
 
         /// <summary>
+        ///   Gets or sets a value indicating whether this instance has changes.
+        /// </summary>
+        [JsonIgnore]
+        public bool HasChanges
+        {
+            get { return mHasChanges; }
+            set { SetPropertyValue(ref mHasChanges, value, () => HasChanges); }
+        }
+
+        /// <summary>
         ///   Gets the child <see cref = "LaunchGroup" />s.
         /// </summary>
         public ObservableCollection<LaunchGroup> LaunchGroups
@@ -101,7 +111,8 @@ namespace AirCannon.Framework.Models
             {
                 if (mLaunchGroups != null)
                 {
-                    mLaunchGroups.CollectionChanged -= HandleLaunchGroupCollectionChanged;
+                    mLaunchGroups.Clear();
+                    mLaunchGroups.CollectionChanged -= _HandleLaunchGroupCollectionChanged;
                 }
 
                 if (SetPropertyValue(ref mLaunchGroups, value, () => LaunchGroups))
@@ -110,25 +121,18 @@ namespace AirCannon.Framework.Models
                     {
                         launchGroup.Parent = this;
                     }
+                    _HandleLaunchGroupCollectionChanged(mLaunchGroups,
+                                                        new NotifyCollectionChangedEventArgs(
+                                                            NotifyCollectionChangedAction.Add, mLaunchGroups));
 
                     HasChanges = true;
                 }
 
                 if (mLaunchGroups != null)
                 {
-                    mLaunchGroups.CollectionChanged += HandleLaunchGroupCollectionChanged;
+                    mLaunchGroups.CollectionChanged += _HandleLaunchGroupCollectionChanged;
                 }
             }
-        }
-
-        /// <summary>
-        ///   Gets or sets a value indicating whether this instance has changes.
-        /// </summary>
-        [JsonIgnore]
-        public bool HasChanges
-        {
-            get { return mHasChanges; }
-            set { SetPropertyValue(ref mHasChanges, value, () => HasChanges); }
         }
 
         /// <summary>
@@ -141,6 +145,7 @@ namespace AirCannon.Framework.Models
             {
                 if (mLaunchers != null)
                 {
+                    mLaunchers.Clear();
                     mLaunchers.CollectionChanged -= _HandleLauncherCollectionChanged;
                 }
 
@@ -150,6 +155,11 @@ namespace AirCannon.Framework.Models
                     {
                         launcher.Parent = this;
                     }
+                    _HandleLauncherCollectionChanged(mLaunchers,
+                                                     new NotifyCollectionChangedEventArgs(
+                                                         NotifyCollectionChangedAction.Add,
+                                                         mLaunchers));
+
                     HasChanges = true;
                 }
 
@@ -292,7 +302,7 @@ namespace AirCannon.Framework.Models
         /// </summary>
         /// <param name = "sender">The source of the event.</param>
         /// <param name = "e">The <see cref = "System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
-        private void HandleLaunchGroupCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void _HandleLaunchGroupCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {

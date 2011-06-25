@@ -1,9 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Input;
 using AirCannon.Framework.Services;
+using AirCannon.Framework.WPF;
 using AirCannon.Properties;
 using AirCannon.Services;
+using AirCannon.ViewModels;
 
 namespace AirCannon
 {
@@ -15,6 +19,7 @@ namespace AirCannon
         private static string mCopyright;
         private static string mVersion;
         private static readonly Assembly ASSEMBLY = Assembly.GetEntryAssembly();
+        private static DelegateCommand mExitCommand;
 
         /// <summary>
         ///   Gets the copyright message.
@@ -43,12 +48,27 @@ namespace AirCannon
         }
 
         /// <summary>
+        ///   Gets the command to exit the application.
+        /// </summary>
+        public static DelegateCommand ExitCommand
+        {
+            get
+            {
+                if (mExitCommand == null)
+                {
+                    mExitCommand = new DelegateCommand(_Exit);
+                }
+                return mExitCommand;
+            }
+        }
+
+        /// <summary>
         ///   Gets or sets the shell window.
         /// </summary>
         public Shell Shell
         {
             get { return MainWindow as Shell; }
-            set { MainWindow = value; }
+            private set { MainWindow = value; }
         }
 
         /// <summary>
@@ -84,10 +104,36 @@ namespace AirCannon
         {
             _RegisterServices();
             Shell = new Shell();
-            
+
             base.OnStartup(e);
 
             Shell.Show();
+        }
+
+        /// <summary>
+        ///   Prompts the user to save and exits.
+        /// </summary>
+        private static void _Exit()
+        {
+            if (Current.Shell.ViewModel.SaveCommand.CanExecute())
+            {
+                const string SAVE = "Save and Exit";
+                const string DISCARD_CHANGES = "Discard Changes and Exit";
+                const string DONT_EXIT = "Don't Exit";
+                var result = Service<IUserInteraction>.Instance.Prompt(
+                    "You currently have unsaved changes that will be lost unless you save before exiting.", "Save?",
+                    SAVE, DISCARD_CHANGES, DONT_EXIT);
+
+                if(result == SAVE)
+                {
+                    Current.Shell.ViewModel.SaveCommand.Execute();
+                }
+                else if(result != DISCARD_CHANGES)
+                {
+                    return;
+                }
+            }
+            Current.Shutdown();
         }
 
         /// <summary>

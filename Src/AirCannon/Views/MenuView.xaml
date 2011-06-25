@@ -1,6 +1,6 @@
 ﻿<UserControl x:Class="AirCannon.Views.MenuView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:AirCannon="clr-namespace:AirCannon">
     <Menu x:Name="mMenu">
         <MenuItem Header="_File">
             <MenuItem Header="_New" Command="{Binding NewCommand}" InputGestureText="Ctrl+N"/>
@@ -8,7 +8,7 @@
             <MenuItem Header="Save _As..." Command="{Binding SaveAsCommand}" InputGestureText="Ctrl+Shift+S"/>
             <MenuItem Header="_Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
             <Separator />
-            <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
+            <MenuItem Header="E_xit" Command="{x:Static AirCannon:App.ExitCommand}"/>
         </MenuItem>
         <MenuItem Header="_Help">
             <MenuItem Header="_About" Command="{Binding ShowAboutCommand}" />
