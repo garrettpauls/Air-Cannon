@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using AirCannon.Framework.Services;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 using Newtonsoft.Json;
@@ -113,7 +114,12 @@ namespace AirCannon.Framework.Models
         /// </summary>
         public bool IsValid
         {
-            get { return mIsValid; }
+            get
+            {
+                OnPropertyChanged(() => File);
+                OnPropertyChanged(() => WorkingDirectory);
+                return mIsValid;
+            }
             private set { SetPropertyValue(ref mIsValid, value, () => IsValid); }
         }
 
@@ -242,7 +248,21 @@ namespace AirCannon.Framework.Models
                 startInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
             }
 
-            return Process.Start(startInfo);
+            Process process = null;
+
+            try
+            {
+                process = Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+                string message =
+                    string.Format("The launcher '{0}' could not be launched. The following error occurred: {2}{2}{1}",
+                                  Name, ex.Message, Environment.NewLine);
+                Service<IUserInteraction>.Instance.ShowErrorMessage(message, "Launch Error");
+            }
+
+            return process;
         }
 
         /// <summary>

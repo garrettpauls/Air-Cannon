@@ -1,4 +1,5 @@
-﻿using AirCannon.Framework.Services;
+﻿using System.Windows;
+using AirCannon.Framework.Services;
 using System.Linq;
 using Microsoft.Win32;
 
@@ -63,6 +64,16 @@ namespace AirCannon.Services
         public string SaveFilePrompt(string fileFilter)
         {
             return _ShowFilePrompt(new SaveFileDialog(), fileFilter);
+        }
+
+        /// <summary>
+        ///   Shows an error message to the user.
+        /// </summary>
+        /// <param name = "message">The message to present to the user.</param>
+        /// <param name = "caption">The caption to present to the user.</param>
+        public void ShowErrorMessage(string message, string caption)
+        {
+            MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         #endregion

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
@@ -43,6 +44,7 @@ namespace AirCannon.ViewModels
         {
             Model = launcher;
             Parent = new LaunchGroupViewModel(Model.Parent);
+            ComponentDispatcher.ThreadIdle += _HandleThreadIdle;
         }
 
         /// <summary>
@@ -324,6 +326,18 @@ namespace AirCannon.ViewModels
         private void _Delete()
         {
             Model.Parent.Delete(Model);
+        }
+
+        /// <summary>
+        ///   Handles the Idle event of the Application to update the launch command.
+        /// </summary>
+        private void _HandleThreadIdle(object sender, EventArgs e)
+        {
+            if (!LaunchCommand.LastCanExecute)
+            {
+                // Check if the file or working dir now exists.
+                LaunchCommand.RaiseCanExecuteChanged();
+            }
         }
 
         /// <summary>

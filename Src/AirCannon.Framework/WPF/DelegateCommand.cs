@@ -63,6 +63,11 @@ namespace AirCannon.Framework.WPF
             mCanExecute = canExecute;
         }
 
+        /// <summary>
+        ///   Gets the value of CanExecute as of the last time it was called.
+        /// </summary>
+        public bool LastCanExecute { get; private set; }
+
         #region ICommand Members
 
         /// <summary>
@@ -110,9 +115,11 @@ namespace AirCannon.Framework.WPF
         {
             if (mCanExecute == null)
             {
+                LastCanExecute = true;
                 return true;
             }
-            return mCanExecute(parameter);
+            LastCanExecute = mCanExecute(parameter);
+            return LastCanExecute;
         }
 
         /// <summary>
