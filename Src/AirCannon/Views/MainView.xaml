@@ -25,7 +25,7 @@
 		<Views:MenuView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding}" />
 		<Views:LauncherTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Path=Root}" x:Name="mLauncherTreeView" />
 		<GridSplitter Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=ColumnGridSplitter}"
-		              HorizontalAlignment="Stretch" />
+		              HorizontalAlignment="Stretch" IsTabStop="False" />
 		<ContentPresenter Grid.Row="1" Grid.Column="2" Content="{Binding ElementName=mLauncherTreeView, Path=SelectedItem}">
 			<ContentPresenter.Resources>
 				<DataTemplate DataType="{x:Type ViewModels:LaunchGroupViewModel}">

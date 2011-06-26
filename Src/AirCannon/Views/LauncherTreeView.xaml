@@ -11,8 +11,8 @@
                   x:Name="mTreeView" WPF:DragDrop.DropCommand="{Binding DropCommand}">
 			<TreeView.Resources>
 				<Style TargetType="TreeViewItem">
-					<Setter Property="IsSelected" Value="{Binding Path=IsSelected}" />
-					<Setter Property="IsExpanded" Value="{Binding Path=IsExpanded}" />
+					<Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}" />
+					<Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}" />
 				</Style>
 				<Style TargetType="TextBlock" x:Key="HasChangesTextBlockStyle">
 					<Style.Triggers>

@@ -399,6 +399,25 @@ namespace AirCannon.ViewModels
             OnPropertyChanged(() => Children);
             HasChildren = Launchers.Count > 0 ||
                           LaunchGroups.Count > 0;
+            if(e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if(sender == mLaunchers)
+                {
+                    foreach (LauncherViewModel launcher in e.NewItems)
+                    {
+                        launcher.Parent.IsExpanded = true;
+                        launcher.IsSelected = true;
+                    }
+                }
+                else if(ReferenceEquals(sender, mLaunchGroups))
+                {
+                    foreach (LaunchGroupViewModel group in e.NewItems)
+                    {
+                        group.Parent.IsExpanded = true;
+                        group.IsSelected = true;
+                    }
+                }
+            }
         }
     }
 }
