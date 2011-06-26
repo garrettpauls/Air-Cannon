@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
@@ -16,7 +15,7 @@ namespace AirCannon.Framework.Tests.Models
         /// <summary>
         ///   Determines if two <see cref = "LaunchGroup" />s are semantically equal.
         /// </summary>
-        private void _Equal(LaunchGroup left, LaunchGroup right)
+        private void _AssertEqual(LaunchGroup left, LaunchGroup right)
         {
             Assert.AreEqual(left.Name, right.Name, "Names must be equal");
             Assert.AreEqual(left.EnvironmentVariables, right.EnvironmentVariables,
@@ -27,7 +26,7 @@ namespace AirCannon.Framework.Tests.Models
 
             foreach (var comp in left.LaunchGroups.Zip(right.LaunchGroups, LinqEx.ToTuple))
             {
-                _Equal(comp.Item1, comp.Item2);
+                _AssertEqual(comp.Item1, comp.Item2);
             }
 
             Assert.AreEqual(left.Launchers.Count, right.Launchers.Count,
@@ -35,14 +34,14 @@ namespace AirCannon.Framework.Tests.Models
 
             foreach (var comp in left.Launchers.Zip(right.Launchers, LinqEx.ToTuple))
             {
-                _Equal(comp.Item1, comp.Item2);
+                _AssertEqual(comp.Item1, comp.Item2);
             }
         }
 
         /// <summary>
         ///   Determines if two <see cref = "Launcher" />s are semantically equal.
         /// </summary>
-        private void _Equal(Launcher left, Launcher right)
+        private void _AssertEqual(Launcher left, Launcher right)
         {
             Assert.AreEqual(left.Arguments, right.Arguments, "Launcher arguments must be equal");
             Assert.AreEqual(left.EnvironmentVariables, right.EnvironmentVariables, "EnvironmentVariables must be equal");
@@ -77,7 +76,8 @@ namespace AirCannon.Framework.Tests.Models
 
             Assert.IsTrue(group.HasChanges, "All Groups and Launchers should have changes");
             Assert.IsTrue(group.LaunchGroups[0].HasChanges, "All Groups and Launchers should have changes");
-            Assert.IsTrue(group.LaunchGroups[0].LaunchGroups[0].HasChanges, "All Groups and Launchers should have changes");
+            Assert.IsTrue(group.LaunchGroups[0].LaunchGroups[0].HasChanges,
+                          "All Groups and Launchers should have changes");
             Assert.IsTrue(group.LaunchGroups[0].Launchers[0].HasChanges, "All Groups and Launchers should have changes");
             Assert.IsTrue(group.Launchers[0].HasChanges, "All Groups and Launchers should have changes");
 
@@ -85,9 +85,64 @@ namespace AirCannon.Framework.Tests.Models
 
             Assert.IsFalse(group.HasChanges, "All Groups and Launchers should not have changes");
             Assert.IsFalse(group.LaunchGroups[0].HasChanges, "All Groups and Launchers should not have changes");
-            Assert.IsFalse(group.LaunchGroups[0].LaunchGroups[0].HasChanges, "All Groups and Launchers should not have changes");
-            Assert.IsFalse(group.LaunchGroups[0].Launchers[0].HasChanges, "All Groups and Launchers should not have changes");
+            Assert.IsFalse(group.LaunchGroups[0].LaunchGroups[0].HasChanges,
+                           "All Groups and Launchers should not have changes");
+            Assert.IsFalse(group.LaunchGroups[0].Launchers[0].HasChanges,
+                           "All Groups and Launchers should not have changes");
             Assert.IsFalse(group.Launchers[0].HasChanges, "All Groups and Launchers should not have changes");
+        }
+
+        /// <summary>
+        ///   Verifies that <see cref = "LaunchGroup.Clone" /> works correctly.
+        /// </summary>
+        [Test]
+        public void CloneTest()
+        {
+            LaunchGroup group = new LaunchGroup();
+            group.EnvironmentVariables.Add("asd", "f");
+            group.Name = "blah";
+            group.Launchers.Add(new Launcher
+                                    {
+                                        Arguments = "b",
+                                        File = "file",
+                                        Name = "blahl",
+                                        WorkingDirectory = "WD"
+                                    });
+            group.LaunchGroups.Add(new LaunchGroup
+                                       {
+                                           Name = "qqqq"
+                                       });
+
+            var clone = group.Clone();
+
+            _AssertEqual(group, clone);
+        }
+
+        /// <summary>
+        ///   Verifies that <see cref = "Launcher.CopyTo" /> works correctly.
+        /// </summary>
+        [Test]
+        public void CopyToTest()
+        {
+            LaunchGroup launchGroup = new LaunchGroup();
+            LaunchGroup source = new LaunchGroup();
+            LaunchGroup dest = new LaunchGroup();
+
+            source.LaunchGroups.Add(launchGroup);
+
+            Assert.That(launchGroup.Parent, Is.SameAs(source));
+            Assert.That(source.LaunchGroups.Count, Is.EqualTo(1));
+            Assert.That(dest.LaunchGroups.Count, Is.EqualTo(0));
+
+            launchGroup.CopyTo(dest);
+
+            Assert.That(launchGroup.Parent, Is.SameAs(source), "The launch group should not have changed groups");
+            Assert.That(source.LaunchGroups.Count, Is.EqualTo(1),
+                        "The launch group should not have been removed from the source group");
+            Assert.That(source.LaunchGroups[0], Is.SameAs(launchGroup),
+                        "The original launch group should still be in the source group");
+            Assert.That(dest.LaunchGroups.Count, Is.EqualTo(1), "The launch group copy was not added to the new group");
+            _AssertEqual(launchGroup, dest.LaunchGroups[0]);
         }
 
         /// <summary>
@@ -131,6 +186,31 @@ namespace AirCannon.Framework.Tests.Models
         }
 
         /// <summary>
+        ///   Verifies that <see cref = "LaunchGroup.MoveTo" /> works correctly.
+        /// </summary>
+        [Test]
+        public void MoveToTest()
+        {
+            LaunchGroup group = new LaunchGroup();
+            LaunchGroup source = new LaunchGroup();
+            LaunchGroup dest = new LaunchGroup();
+
+            source.LaunchGroups.Add(group);
+
+            Assert.That(group.Parent, Is.SameAs(source));
+            Assert.That(source.LaunchGroups.Count, Is.EqualTo(1));
+            Assert.That(dest.LaunchGroups.Count, Is.EqualTo(0));
+
+            group.MoveTo(dest);
+
+            Assert.That(group.Parent, Is.SameAs(dest), "The launch group was copied to the wrong group");
+            Assert.That(source.LaunchGroups.Count, Is.EqualTo(0),
+                        "The launch group was not removed from its original group");
+            Assert.That(dest.LaunchGroups.Count, Is.EqualTo(1), "The launch group was not added to the new group");
+            Assert.That(dest.LaunchGroups[0], Is.SameAs(group), "The launch group was not added to the new group");
+        }
+
+        /// <summary>
         ///   Verifies that a saved <see cref = "LaunchGroup" /> can be loaded to create an equivalent one.
         /// </summary>
         [Test]
@@ -148,13 +228,13 @@ namespace AirCannon.Framework.Tests.Models
                                           }
                                   };
             launchGroup.LaunchGroups.Add(new LaunchGroup
-                                       {
-                                           Name = "LG1",
-                                           EnvironmentVariables =
-                                               {
-                                                   {"Var3", "Val3"}
-                                               }
-                                       });
+                                             {
+                                                 Name = "LG1",
+                                                 EnvironmentVariables =
+                                                     {
+                                                         {"Var3", "Val3"}
+                                                     }
+                                             });
             launchGroup.Launchers.Add(new Launcher
                                           {
                                               Arguments = "abc",
@@ -173,7 +253,7 @@ namespace AirCannon.Framework.Tests.Models
 
             Assert.AreNotSame(launchGroup, newGroup, "LoadFrom should have created a new group");
 
-            _Equal(launchGroup, newGroup);
+            _AssertEqual(launchGroup, newGroup);
         }
     }
 }

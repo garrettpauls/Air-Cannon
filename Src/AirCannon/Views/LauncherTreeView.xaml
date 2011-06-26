@@ -2,10 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
+             xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 	<Grid>
-		<TreeView ItemsSource="{Binding Path=Children}" SelectedItemChanged="_HandleSelectedItemChanged" x:Name="mTreeView">
+		<TreeView ItemsSource="{Binding Path=Children}" SelectedItemChanged="_HandleSelectedItemChanged" 
+                  x:Name="mTreeView" WPF:DragDrop.DropCommand="{Binding DropCommand}">
 			<TreeView.Resources>
 				<Style TargetType="TreeViewItem">
 					<Setter Property="IsSelected" Value="{Binding Path=IsSelected}" />
@@ -21,7 +24,9 @@
 				<HierarchicalDataTemplate DataType="{x:Type ViewModels:LaunchGroupViewModel}"
 				                          ItemsSource="{Binding Children}">
 					<TextBlock Text="{Binding Name}"
-					           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
+					           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}"
+                               WPF:DragDrop.Enabled="True"
+                               WPF:DragDrop.DropCommand="{Binding DropCommand}">
 						<TextBlock.ContextMenu>
 							<ContextMenu>
 								<MenuItem Header="Add _Launcher"
@@ -34,12 +39,13 @@
 						</TextBlock.ContextMenu>
 					</TextBlock>
 				</HierarchicalDataTemplate>
-				<DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
+                <DataTemplate DataType="{x:Type ViewModels:LauncherViewModel}">
 					<StackPanel Orientation="Horizontal" Margin="-16 0 0 0">
 						<Image Source="/Resources/Icons/bullet_go.png"
 						       Width="16" Height="16" />
 						<TextBlock Text="{Binding Name}"
-						           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}">
+                                   Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}"
+                                   WPF:DragDrop.Enabled="True">
 							<TextBlock.ContextMenu>
 								<ContextMenu>
 									<MenuItem Header="_Launch" Command="{Binding Path=LaunchCommand}" />

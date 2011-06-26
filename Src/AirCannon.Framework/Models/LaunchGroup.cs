@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
 using Newtonsoft.Json;
@@ -15,7 +13,7 @@ namespace AirCannon.Framework.Models
     /// <summary>
     ///   Represents a group of <see cref = "Launcher" />s that share common settings.
     /// </summary>
-    [DebuggerDisplay("{Name}")]
+    [DebuggerDisplay("Name = {Name}")]
     public class LaunchGroup : NotifyPropertyChangedBase
     {
         private EnvironmentVariableCollection mEnvironmentVariables;
@@ -208,6 +206,23 @@ namespace AirCannon.Framework.Models
         }
 
         /// <summary>
+        ///   Creates a clone of this instance. All children are also cloned.
+        /// </summary>
+        public LaunchGroup Clone()
+        {
+            var serialized = JsonConvert.SerializeObject(this);
+            return JsonConvert.DeserializeObject<LaunchGroup>(serialized);
+        }
+
+        /// <summary>
+        ///   Copies this launch group from its current group to the destination group.
+        /// </summary>
+        public void CopyTo(LaunchGroup destination)
+        {
+            destination.LaunchGroups.Add(Clone());
+        }
+
+        /// <summary>
         ///   Deletes the specified child group.
         /// </summary>
         public void Delete(LaunchGroup childGroup)
@@ -235,6 +250,15 @@ namespace AirCannon.Framework.Models
             group.ClearAllHasChanges();
 
             return group;
+        }
+
+        /// <summary>
+        ///   Moves this launch group from its current group to the destination group.
+        /// </summary>
+        public void MoveTo(LaunchGroup destination)
+        {
+            Parent.LaunchGroups.Remove(this);
+            destination.LaunchGroups.Add(this);
         }
 
         /// <summary>

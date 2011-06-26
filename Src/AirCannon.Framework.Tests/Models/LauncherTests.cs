@@ -102,7 +102,56 @@ namespace AirCannon.Framework.Tests.Models
             Assert.That(envVars, Contains.Item(new EnvironmentVariable("D", "D2")));
             Assert.That(envVars, Contains.Item(new EnvironmentVariable("E", "E")));
         }
-        
+
+        /// <summary>
+        ///   Verifies that <see cref = "Launcher.Clone" /> works correctly.
+        /// </summary>
+        [Test]
+        public void CloneTest()
+        {
+            Launcher launcher = new Launcher();
+            launcher.Arguments = "asdfasdfasdf";
+            launcher.EnvironmentVariables.Add("asd", "f");
+            launcher.File = "somefile";
+            launcher.Name = "blah";
+            launcher.WorkingDirectory = "WD";
+
+            var clone = launcher.Clone();
+
+            Assert.That(clone.Arguments, Is.EqualTo(launcher.Arguments));
+            Assert.That(clone.EnvironmentVariables, Is.EqualTo(launcher.EnvironmentVariables));
+            Assert.That(clone.File, Is.EqualTo(launcher.File));
+            Assert.That(clone.Name, Is.EqualTo(launcher.Name));
+            Assert.That(clone.WorkingDirectory, Is.EqualTo(launcher.WorkingDirectory));
+        }
+
+        /// <summary>
+        ///   Verifies that <see cref = "Launcher.CopyTo" /> works correctly.
+        /// </summary>
+        [Test]
+        public void CopyToTest()
+        {
+            Launcher launcher = new Launcher();
+            LaunchGroup source = new LaunchGroup();
+            LaunchGroup dest = new LaunchGroup();
+
+            source.Launchers.Add(launcher);
+
+            Assert.That(launcher.Parent, Is.SameAs(source));
+            Assert.That(source.Launchers.Count, Is.EqualTo(1));
+            Assert.That(dest.Launchers.Count, Is.EqualTo(0));
+
+            launcher.CopyTo(dest);
+
+            Assert.That(launcher.Parent, Is.SameAs(source), "The launcher should not have changed groups");
+            Assert.That(source.Launchers.Count, Is.EqualTo(1),
+                        "The launcher should not have been removed from the source group");
+            Assert.That(source.Launchers[0], Is.SameAs(launcher),
+                        "The original launcher should still be in the source group");
+            Assert.That(dest.Launchers.Count, Is.EqualTo(1), "The launcher copy was not added to the new group");
+            Assert.That(dest.Launchers[0], Is.EqualTo(launcher), "The launcher copy was not added to the new group");
+        }
+
         /// <summary>
         ///   Verifies the File property validates correctly.
         /// </summary>
@@ -204,7 +253,8 @@ namespace AirCannon.Framework.Tests.Models
             string testFilePath = Path.Combine(mTempDir, "test.txt");
             string script = @"
 @echo %v1%>>""" + testFilePath + @"""
-@echo %v2%>>""" + testFilePath + @"""
+@echo %v2%>>""" + testFilePath +
+                            @"""
 @echo %v3%>>""" + testFilePath + @"""";
 
             var v1 = new EnvironmentVariable("v1", "{E16620DD-D150-4F2C-B4AE-DBC54E72373C}");
@@ -231,6 +281,30 @@ namespace AirCannon.Framework.Tests.Models
             Assert.AreEqual(v1.Value, contents[0], "The first environment variable value was wrong");
             Assert.AreEqual(v2.Value, contents[1], "The second environment variable value was wrong");
             Assert.AreEqual(v3.Value, contents[2], "The third environment variable value was wrong");
+        }
+
+        /// <summary>
+        ///   Verifies that <see cref = "Launcher.MoveTo" /> works correctly.
+        /// </summary>
+        [Test]
+        public void MoveToTest()
+        {
+            Launcher launcher = new Launcher();
+            LaunchGroup source = new LaunchGroup();
+            LaunchGroup dest = new LaunchGroup();
+
+            source.Launchers.Add(launcher);
+
+            Assert.That(launcher.Parent, Is.SameAs(source));
+            Assert.That(source.Launchers.Count, Is.EqualTo(1));
+            Assert.That(dest.Launchers.Count, Is.EqualTo(0));
+
+            launcher.MoveTo(dest);
+
+            Assert.That(launcher.Parent, Is.SameAs(dest), "The launcher was copied to the wrong group");
+            Assert.That(source.Launchers.Count, Is.EqualTo(0), "The launcher was not removed from its original group");
+            Assert.That(dest.Launchers.Count, Is.EqualTo(1), "The launcher was not added to the new group");
+            Assert.That(dest.Launchers[0], Is.SameAs(launcher), "The launcher was not added to the new group");
         }
 
         /// <summary>

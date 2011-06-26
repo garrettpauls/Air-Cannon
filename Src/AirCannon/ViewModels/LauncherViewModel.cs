@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using System.Windows.Interop;
@@ -15,6 +16,7 @@ namespace AirCannon.ViewModels
     /// <summary>
     ///   A view model for the <see cref = "Launcher" /> class.
     /// </summary>
+    [DebuggerDisplay("Model = {Model}")]
     public class LauncherViewModel : ViewModelBase<Launcher>, IDataErrorInfo
     {
         private static readonly string[] mPassthroughPropertyNames =

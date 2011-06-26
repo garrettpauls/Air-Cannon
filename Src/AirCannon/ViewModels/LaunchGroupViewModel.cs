@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using AirCannon.Framework.Models;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
@@ -10,6 +12,7 @@ namespace AirCannon.ViewModels
     /// <summary>
     ///   A view model for the <see cref = "LaunchGroup" /> class.
     /// </summary>
+    [DebuggerDisplay("Model = {Model}")]
     public class LaunchGroupViewModel : ViewModelBase<LaunchGroup>
     {
         private static readonly string[] mPassthroughPropertyNames =
@@ -25,6 +28,7 @@ namespace AirCannon.ViewModels
         private DelegateCommand mAddLaunchGroupCommand;
         private DelegateCommand mAddLauncherCommand;
         private DelegateCommand mDeleteCommand;
+        private DelegateCommand<DragEventArgs> mDropCommand;
         private bool mHasChildren;
         private bool mIsExpanded;
         private bool mIsSelected;
@@ -93,6 +97,18 @@ namespace AirCannon.ViewModels
                     mDeleteCommand = new DelegateCommand(_Delete, () => Model.Parent != null);
                 }
                 return mDeleteCommand;
+            }
+        }
+
+        public DelegateCommand<DragEventArgs> DropCommand
+        {
+            get
+            {
+                if (mDropCommand == null)
+                {
+                    mDropCommand = new DelegateCommand<DragEventArgs>(_Drop, _CanDrop);
+                }
+                return mDropCommand;
             }
         }
 
@@ -285,15 +301,25 @@ namespace AirCannon.ViewModels
             base.OnBasePropertyChanged(propertyName);
         }
 
+        private bool HasChild(LaunchGroupViewModel vm)
+        {
+            if (LaunchGroups.Count == 0)
+            {
+                return false;
+            }
+
+            return LaunchGroups.Any(g => Equals(g, vm) || g.HasChild(vm));
+        }
+
         /// <summary>
         ///   Adds a new launch group.
         /// </summary>
         private void _AddLaunchGroup()
         {
             Model.LaunchGroups.Add(new LaunchGroup(Model)
-                                 {
-                                     Name = "New launch group"
-                                 });
+                                       {
+                                           Name = "New launch group"
+                                       });
         }
 
         /// <summary>
@@ -308,11 +334,58 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
+        ///   Determines if an object can be dropped onto this group.
+        /// </summary>
+        private bool _CanDrop(DragEventArgs args)
+        {
+            if (args.Data.GetDataPresent(typeof (LaunchGroupViewModel)))
+            {
+                var data = args.Data.GetData<LaunchGroupViewModel>();
+                return !data.HasChild(this);
+            }
+
+            return args.Data.GetDataPresent(typeof (LauncherViewModel));
+        }
+
+        /// <summary>
         ///   Deletes this launch group from its parent.
         /// </summary>
         private void _Delete()
         {
             Model.Parent.Delete(Model);
+        }
+
+        /// <summary>
+        ///   Handles dropping an object onto this launch group.
+        /// </summary>
+        private void _Drop(DragEventArgs args)
+        {
+            if (args.Data.GetDataPresent(typeof (LaunchGroupViewModel)))
+            {
+                var data = args.Data.GetData<LaunchGroupViewModel>();
+                if (args.KeyStates == DragDropKeyStates.ControlKey)
+                {
+                    data.Model.CopyTo(Model);
+                }
+                else
+                {
+                    data.Model.MoveTo(Model);
+                }
+                args.Handled = true;
+            }
+            else if (args.Data.GetDataPresent(typeof (LauncherViewModel)))
+            {
+                var data = args.Data.GetData<LauncherViewModel>();
+                if (args.KeyStates == DragDropKeyStates.ControlKey)
+                {
+                    data.Model.CopyTo(Model);
+                }
+                else
+                {
+                    data.Model.MoveTo(Model);
+                }
+                args.Handled = true;
+            }
         }
 
         /// <summary>

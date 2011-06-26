@@ -16,7 +16,7 @@ namespace AirCannon.Framework.Models
     /// <summary>
     ///   Settings for launching a given application.
     /// </summary>
-    [DebuggerDisplay("{Name}")]
+    [DebuggerDisplay("Name = {Name}")]
     public class Launcher : NotifyPropertyChangedBase, IDataErrorInfo
     {
         private string mArguments;
@@ -230,6 +230,81 @@ namespace AirCannon.Framework.Models
         }
 
         /// <summary>
+        ///   Creates a copy of this launcher.
+        /// </summary>
+        public Launcher Clone()
+        {
+            var serialized = JsonConvert.SerializeObject(this);
+            return JsonConvert.DeserializeObject<Launcher>(serialized);
+        }
+
+        /// <summary>
+        ///   Copies this launcher from its current group to the destination group.
+        /// </summary>
+        public void CopyTo(LaunchGroup destination)
+        {
+            destination.Launchers.Add(Clone());
+        }
+
+        public bool Equals(Launcher other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return Equals(other.mArguments, mArguments) && Equals(other.mEnvironmentVariables, mEnvironmentVariables) &&
+                   Equals(other.mFile, mFile) && Equals(other.mName, mName) &&
+                   Equals(other.mWorkingDirectory, mWorkingDirectory);
+        }
+
+        /// <summary>
+        ///   Determines whether the specified <see cref = "System.Object" /> is equal to this instance.
+        /// </summary>
+        /// <param name = "obj">The <see cref = "System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref = "System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != typeof (Launcher))
+            {
+                return false;
+            }
+            return Equals((Launcher) obj);
+        }
+
+        /// <summary>
+        ///   Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        ///   A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (mArguments != null ? mArguments.GetHashCode() : 0);
+                result = (result*397) ^ (mEnvironmentVariables != null ? mEnvironmentVariables.GetHashCode() : 0);
+                result = (result*397) ^ (mFile != null ? mFile.GetHashCode() : 0);
+                result = (result*397) ^ (mName != null ? mName.GetHashCode() : 0);
+                result = (result*397) ^ (mWorkingDirectory != null ? mWorkingDirectory.GetHashCode() : 0);
+                return result;
+            }
+        }
+
+        /// <summary>
         ///   Launches the application and returns the running process.
         /// </summary>
         public Process Launch()
@@ -263,6 +338,15 @@ namespace AirCannon.Framework.Models
             }
 
             return process;
+        }
+
+        /// <summary>
+        ///   Moves this launcher from its current group to the destination group.
+        /// </summary>
+        public void MoveTo(LaunchGroup destination)
+        {
+            Parent.Launchers.Remove(this);
+            destination.Launchers.Add(this);
         }
 
         /// <summary>
