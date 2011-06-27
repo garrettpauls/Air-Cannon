@@ -26,7 +26,8 @@
 					<TextBlock Text="{Binding Name}"
 					           Style="{StaticResource ResourceKey=HasChangesTextBlockStyle}"
                                WPF:DragDrop.Enabled="True"
-                               WPF:DragDrop.DropCommand="{Binding DropCommand}">
+                               WPF:DragDrop.DropCommand="{Binding DropCommand}"
+                               WPF:DragDrop.DragOverCommand="{Binding DragOverCommand}">
 						<TextBlock.ContextMenu>
 							<ContextMenu>
 								<MenuItem Header="Add _Launcher"

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace AirCannon.ViewModels
         private DelegateCommand mAddLaunchGroupCommand;
         private DelegateCommand mAddLauncherCommand;
         private DelegateCommand mDeleteCommand;
+        private DelegateCommand<DragEventArgs> mDragOverCommand;
         private DelegateCommand<DragEventArgs> mDropCommand;
         private bool mHasChildren;
         private bool mIsExpanded;
@@ -97,6 +99,18 @@ namespace AirCannon.ViewModels
                     mDeleteCommand = new DelegateCommand(_Delete, () => Model.Parent != null);
                 }
                 return mDeleteCommand;
+            }
+        }
+
+        public DelegateCommand<DragEventArgs> DragOverCommand
+        {
+            get
+            {
+                if (mDragOverCommand == null)
+                {
+                    mDragOverCommand = new DelegateCommand<DragEventArgs>(_DragOver);
+                }
+                return mDragOverCommand;
             }
         }
 
@@ -356,6 +370,17 @@ namespace AirCannon.ViewModels
         }
 
         /// <summary>
+        ///   When a droppable object is drug over this group, it is expanded.
+        /// </summary>
+        private void _DragOver(DragEventArgs args)
+        {
+            if (_CanDrop(args) && !IsExpanded)
+            {
+                IsExpanded = true;
+            }
+        }
+
+        /// <summary>
         ///   Handles dropping an object onto this launch group.
         /// </summary>
         private void _Drop(DragEventArgs args)
@@ -399,9 +424,9 @@ namespace AirCannon.ViewModels
             OnPropertyChanged(() => Children);
             HasChildren = Launchers.Count > 0 ||
                           LaunchGroups.Count > 0;
-            if(e.Action == NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                if(sender == mLaunchers)
+                if (sender == mLaunchers)
                 {
                     foreach (LauncherViewModel launcher in e.NewItems)
                     {
@@ -409,7 +434,7 @@ namespace AirCannon.ViewModels
                         launcher.IsSelected = true;
                     }
                 }
-                else if(ReferenceEquals(sender, mLaunchGroups))
+                else if (ReferenceEquals(sender, mLaunchGroups))
                 {
                     foreach (LaunchGroupViewModel group in e.NewItems)
                     {

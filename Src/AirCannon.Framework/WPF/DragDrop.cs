@@ -7,7 +7,7 @@ using SysDragDrop=System.Windows.DragDrop;
 namespace AirCannon.Framework.WPF
 {
     /// <summary>
-    /// An extension class for managing Drag and Drop via commands.
+    ///   An extension class for managing Drag and Drop via commands.
     /// </summary>
     public static class DragDrop
     {
@@ -15,6 +15,7 @@ namespace AirCannon.Framework.WPF
         public static readonly DependencyProperty EnabledProperty;
         public static readonly DependencyProperty BeginDragCommandProperty;
         public static readonly DependencyProperty DropCommandProperty;
+        public static readonly DependencyProperty DragOverCommandProperty;
 
         static DragDrop()
         {
@@ -27,6 +28,9 @@ namespace AirCannon.Framework.WPF
             DropCommandProperty = DependencyProperty.RegisterAttached(
                 "DropCommand", typeof (ICommand), typeof (DragDrop),
                 new PropertyMetadata(_HandleDropCommandChanged));
+            DragOverCommandProperty = DependencyProperty.RegisterAttached(
+                "DragOverCommand", typeof (ICommand), typeof (DragDrop),
+                new PropertyMetadata(_HandleDragOverCommandChanged));
         }
 
         /// <summary>
@@ -52,6 +56,11 @@ namespace AirCannon.Framework.WPF
             return (ICommand) element.GetValue(BeginDragCommandProperty);
         }
 
+        public static ICommand GetDragOverCommand(UIElement element)
+        {
+            return (ICommand) element.GetValue(DragOverCommandProperty);
+        }
+
         public static ICommand GetDropCommand(UIElement element)
         {
             return (ICommand) element.GetValue(DropCommandProperty);
@@ -71,6 +80,15 @@ namespace AirCannon.Framework.WPF
         public static void SetBeginDragCommand(UIElement element, ICommand command)
         {
             element.SetValue(BeginDragCommandProperty, command);
+        }
+
+        /// <summary>
+        ///   This command is called when the element is drug over.
+        ///   The command is passed one parameter of type <see cref = "DragEventArgs" />.
+        /// </summary>
+        public static void SetDragOverCommand(UIElement element, ICommand command)
+        {
+            element.SetValue(DragOverCommandProperty, command);
         }
 
         /// <summary>
@@ -110,6 +128,25 @@ namespace AirCannon.Framework.WPF
             }
         }
 
+        private static void _HandleDragOver(object sender, DragEventArgs e)
+        {
+            ICommand command = GetDragOverCommand((UIElement) sender);
+            if (command != null && command.CanExecute(e))
+            {
+                command.Execute(e);
+            }
+        }
+
+        private static void _HandleDragOverCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UIElement element = (UIElement) d;
+            element.DragOver -= _HandleDragOver;
+            if (e.NewValue != null)
+            {
+                element.DragOver += _HandleDragOver;
+            }
+        }
+
         private static void _HandleDrop(object sender, DragEventArgs e)
         {
             var command = GetDropCommand((UIElement) sender);
@@ -124,18 +161,25 @@ namespace AirCannon.Framework.WPF
             UIElement element = (UIElement) d;
             element.AllowDrop = e.NewValue != null;
             element.Drop -= _HandleDrop;
-            element.Drop += _HandleDrop;
+            if (e.NewValue != null)
+            {
+                element.Drop += _HandleDrop;
+            }
         }
 
         private static void _HandleEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement) d;
             element.PreviewMouseLeftButtonDown -= _HandlePreviewMouseLeftButtonDown;
-            element.PreviewMouseLeftButtonDown += _HandlePreviewMouseLeftButtonDown;
-            element.MouseMove -= _HandleMouseMove;
-            element.MouseMove += _HandleMouseMove;
             element.MouseLeave -= _HandleMouseLeave;
-            element.MouseLeave += _HandleMouseLeave;
+            element.MouseMove -= _HandleMouseMove;
+
+            if (e.NewValue != null)
+            {
+                element.PreviewMouseLeftButtonDown += _HandlePreviewMouseLeftButtonDown;
+                element.MouseLeave += _HandleMouseLeave;
+                element.MouseMove += _HandleMouseMove;
+            }
         }
 
         /// <summary>
