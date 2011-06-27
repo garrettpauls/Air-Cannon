@@ -30,6 +30,7 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>67</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -82,7 +83,9 @@
     <Compile Include="Utilities\DataObjectExtensions.cs" />
     <Compile Include="Utilities\LinqEx.cs" />
     <Compile Include="Utilities\Property.cs" />
+    <Compile Include="WPF\Debug\PassThroughConverter.cs" />
     <Compile Include="WPF\DelegateCommand.cs" />
+    <Compile Include="WPF\DisableCommand.cs" />
     <Compile Include="WPF\DragDrop.cs" />
     <Compile Include="WPF\NotifyPropertyChangedBase.cs" />
     <Compile Include="WPF\ReadOnlyWrappingCollection.cs" />

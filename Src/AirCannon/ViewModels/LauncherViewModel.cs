@@ -16,7 +16,7 @@ namespace AirCannon.ViewModels
     /// <summary>
     ///   A view model for the <see cref = "Launcher" /> class.
     /// </summary>
-    [DebuggerDisplay("Model = {Model}")]
+    [DebuggerDisplay("Name = {Name}")]
     public class LauncherViewModel : ViewModelBase<Launcher>, IDataErrorInfo
     {
         private static readonly string[] mPassthroughPropertyNames =

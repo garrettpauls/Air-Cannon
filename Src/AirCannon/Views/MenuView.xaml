@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="AirCannon.Views.MenuView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:AirCannon="clr-namespace:AirCannon">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:AirCannon="clr-namespace:AirCannon" 
+             xmlns:WPF="clr-namespace:AirCannon.Framework.WPF;assembly=AirCannon.Framework">
     <Menu x:Name="mMenu">
         <MenuItem Header="_File">
             <MenuItem Header="_New" Command="{Binding NewCommand}" InputGestureText="Ctrl+N"/>
@@ -9,6 +10,12 @@
             <MenuItem Header="_Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
             <Separator />
             <MenuItem Header="E_xit" Command="{x:Static AirCannon:App.ExitCommand}"/>
+        </MenuItem>
+        <MenuItem Header="_Edit">
+            <MenuItem Header="New _Launcher" DataContext="{Binding SelectedItem}"
+                      Command="{Binding Path=AddLauncherCommand, FallbackValue={WPF:DisableCommand}}" />
+            <MenuItem Header="New Launch _Group" DataContext="{Binding SelectedItem}"
+                      Command="{Binding Path=AddLaunchGroupCommand, FallbackValue={WPF:DisableCommand}}"/>
         </MenuItem>
         <MenuItem Header="_Help">
             <MenuItem Header="_About" Command="{Binding ShowAboutCommand}" />

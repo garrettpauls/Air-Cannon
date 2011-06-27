@@ -13,7 +13,7 @@ namespace AirCannon.ViewModels
     /// <summary>
     ///   A view model for the <see cref = "LaunchGroup" /> class.
     /// </summary>
-    [DebuggerDisplay("Model = {Model}")]
+    [DebuggerDisplay("Name = {Name}")]
     public class LaunchGroupViewModel : ViewModelBase<LaunchGroup>
     {
         private static readonly string[] mPassthroughPropertyNames =

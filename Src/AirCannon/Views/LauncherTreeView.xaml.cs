@@ -26,7 +26,7 @@ namespace AirCannon.Views
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(Property<LauncherTreeView>.Name(p => p.SelectedItem),
                                         typeof (object), typeof (LauncherTreeView),
-                                        new PropertyMetadata(null));
+                                        new FrameworkPropertyMetadata(null));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LauncherTreeView"/> class.
@@ -42,7 +42,7 @@ namespace AirCannon.Views
         public object SelectedItem
         {
             get { return GetValue(SelectedItemProperty); }
-            private set { SetValue(SelectedItemProperty, value); }
+            set {  }
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace AirCannon.Views
         /// <param name = "e">The <see cref = "object" /> instance containing the event data.</param>
         private void _HandleSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            SelectedItem = e.NewValue;
+            SetValue(SelectedItemProperty, e.NewValue);
         }
     }
 }

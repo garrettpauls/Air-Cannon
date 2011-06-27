@@ -24,6 +24,7 @@ namespace AirCannon.ViewModels
         private LaunchGroupViewModel mRoot;
         private DelegateCommand mSaveAsCommand;
         private DelegateCommand mSaveCommand;
+        private object mSelectedItem;
         private DelegateCommand mShowAboutCommand;
         private DelegateCommand mToggleMainWindowCommand;
 
@@ -137,6 +138,15 @@ namespace AirCannon.ViewModels
                 }
                 return mSaveCommand;
             }
+        }
+
+        /// <summary>
+        ///   Gets or sets the selected item.
+        /// </summary>
+        public object SelectedItem
+        {
+            get { return mSelectedItem; }
+            set { SetPropertyValue(ref mSelectedItem, value, () => SelectedItem); }
         }
 
         /// <summary>
