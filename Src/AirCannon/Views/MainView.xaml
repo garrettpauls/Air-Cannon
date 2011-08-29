@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Views="clr-namespace:AirCannon.Views" 
              xmlns:ViewModels="clr-namespace:AirCannon.ViewModels"
-             xmlns:Debug="clr-namespace:AirCannon.Framework.WPF.Debug;assembly=AirCannon.Framework"
              MinWidth="400" MinHeight="300" x:Name="mMainView">
 	<UserControl.Resources>
 		<Style TargetType="GridSplitter" x:Key="ColumnGridSplitter">
