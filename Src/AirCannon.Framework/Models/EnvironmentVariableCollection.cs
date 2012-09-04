@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AirCannon.Framework.Utilities;
 using Newtonsoft.Json;
 
@@ -141,6 +142,35 @@ namespace AirCannon.Framework.Models
             }
             return Equals((EnvironmentVariableCollection) obj);
         }
+
+        public string Expand(string value)
+        {
+            if(string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return mExpandRegex.Replace(value, _HandleExpandMatch);
+        }
+
+        private string _HandleExpandMatch(Match match)
+        {
+            var key = match.Groups["var"].Value;
+            string result;
+
+            if(ContainsKey(key))
+            {
+                result = this[key];
+            }
+            else
+            {
+                result = Environment.GetEnvironmentVariable(key) ?? "%" + key + "%";
+            }
+
+            return result;
+        }
+
+        private static readonly Regex mExpandRegex = new Regex(@"%(?<var>[^%]+)%");
 
         /// <summary>
         ///   Returns a hash code for this instance.

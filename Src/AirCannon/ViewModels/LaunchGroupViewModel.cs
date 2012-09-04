@@ -430,15 +430,15 @@ namespace AirCannon.ViewModels
                 {
                     foreach (LauncherViewModel launcher in e.NewItems)
                     {
-                        launcher.Parent.IsExpanded = true;
+                    	IsExpanded = true;
                         launcher.IsSelected = true;
                     }
                 }
                 else if (ReferenceEquals(sender, mLaunchGroups))
                 {
                     foreach (LaunchGroupViewModel group in e.NewItems)
-                    {
-                        group.Parent.IsExpanded = true;
+					{
+						IsExpanded = true;
                         group.IsSelected = true;
                     }
                 }

@@ -83,7 +83,6 @@
     <Compile Include="Utilities\DataObjectExtensions.cs" />
     <Compile Include="Utilities\LinqEx.cs" />
     <Compile Include="Utilities\Property.cs" />
-    <Compile Include="WPF\Debug\PassThroughConverter.cs" />
     <Compile Include="WPF\DelegateCommand.cs" />
     <Compile Include="WPF\DisableCommand.cs" />
     <Compile Include="WPF\DragDrop.cs" />

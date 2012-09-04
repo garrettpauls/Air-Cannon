@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 using System.Windows.Markup;
+#pragma warning disable 67
 
 namespace AirCannon.Framework.WPF
 {

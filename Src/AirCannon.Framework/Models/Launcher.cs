@@ -4,7 +4,9 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using AirCannon.Framework.Services;
 using AirCannon.Framework.Utilities;
 using AirCannon.Framework.WPF;
@@ -182,15 +184,16 @@ namespace AirCannon.Framework.Models
 
                 if (propertyName == Property.Name(() => File))
                 {
-                    if (!IOFile.Exists(File))
+                    if (!IOFile.Exists(AggregateEnvironmentVariables().Expand(File)))
                     {
                         error = "File must exist.";
                     }
                 }
                 else if (propertyName == Property.Name(() => WorkingDirectory))
                 {
-                    if (!string.IsNullOrEmpty(WorkingDirectory) &&
-                        !Directory.Exists(WorkingDirectory))
+                	var wd = AggregateEnvironmentVariables().Expand(WorkingDirectory);
+                    if (!string.IsNullOrEmpty(wd) &&
+                        !Directory.Exists(wd))
                     {
                         error = "Working directory must exist.";
                     }
@@ -208,22 +211,25 @@ namespace AirCannon.Framework.Models
         /// </summary>
         public EnvironmentVariableCollection AggregateEnvironmentVariables()
         {
-            var envVars = new Stack<EnvironmentVariableCollection>();
-            envVars.Push(EnvironmentVariables);
-
-            LaunchGroup parent = mParent;
-
-            while (parent != null)
+            var vars = new Stack<EnvironmentVariableCollection>();
+            vars.Push(EnvironmentVariables);
+            var parent = mParent;
+            while(parent != null)
             {
-                envVars.Push(parent.EnvironmentVariables);
+                vars.Push(parent.EnvironmentVariables);
                 parent = parent.Parent;
             }
 
-            var aggregatedEnvVars = new EnvironmentVariableCollection(envVars.Pop());
+            var aggregatedEnvVars = new EnvironmentVariableCollection();
 
-            while (envVars.Count > 0)
+            while(vars.Any())
             {
-                aggregatedEnvVars.UpdateWith(envVars.Pop());
+                var v = vars.Pop();
+                foreach(EnvironmentVariable envVar in v)
+                {
+                    var value = aggregatedEnvVars.Expand(envVar.Value);
+                    aggregatedEnvVars.UpdateWith(new EnvironmentVariable(envVar.Key, value));
+                }
             }
 
             return aggregatedEnvVars;
@@ -309,11 +315,13 @@ namespace AirCannon.Framework.Models
         /// </summary>
         public Process Launch()
         {
-            var startInfo = new ProcessStartInfo(File, Arguments);
-            startInfo.WorkingDirectory = WorkingDirectory;
+            var aggregateVars = AggregateEnvironmentVariables();
+
+            var startInfo = new ProcessStartInfo(aggregateVars.Expand(File), aggregateVars.Expand(Arguments));
+            startInfo.WorkingDirectory = aggregateVars.Expand(WorkingDirectory);
             startInfo.UseShellExecute = false;
 
-            foreach (var envVar in AggregateEnvironmentVariables())
+            foreach (var envVar in aggregateVars)
             {
                 if (string.IsNullOrEmpty(envVar.Key) ||
                     string.IsNullOrEmpty(envVar.Value))
